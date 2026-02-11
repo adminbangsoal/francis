@@ -6,18 +6,7 @@ export const TRY_OUT_PATH = /^\/try-out\/.+/;
 export const CATATAN_PATH = /^\/bang-catatan\/.+/;
 export const CATATAN_BASE_PATH = "/bang-catatan";
 export const DASHBOARD_PATH = ["/dashboard"];
+// Only landing page is available for now
 export const AVAILABLE_PATHS = [
-  ...AUTH_PATHS,
   "/",
-  "/langganan",
-  "/dashboard",
-  "/latihan/riwayat",
-  LATSOL_PATH,
-  "/latihan-soal-timed",
-  LATSOL_NEW_PATH,
-  "/leaderboard",
-  "/try-out",
-  TRY_OUT_PATH,
-  CATATAN_BASE_PATH,
-  CATATAN_PATH,
 ];

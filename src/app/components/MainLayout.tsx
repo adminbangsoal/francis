@@ -38,10 +38,9 @@ export const MainLayout = ({ children }: MainLayoutI) => {
     CATATAN_BASE_PATH === pathname;
 
   useEffect(() => {
-    if (process.env.NEXT_PUBLIC_IS_MAINTENANCE) {
-      if (pathname !== "/" && pathname !== "/maintenance") {
-        window.location.href = "/maintenance";
-      }
+    // Only allow landing page - redirect all other pages to maintenance
+    if (pathname !== "/" && pathname !== "/maintenance") {
+      window.location.href = "/maintenance";
     }
   }, [pathname]);
 

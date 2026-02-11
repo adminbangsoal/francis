@@ -17,70 +17,54 @@ export default async function middleware(
   request: NextRequest,
   event: NextFetchEvent,
 ) {
-  // if root path, just return next
-  if (request.url === "/") {
+  const url = new URL(request.url);
+  const pathname = url.pathname;
+
+  // Allow landing page (/) to always be accessible without backend check
+  if (pathname === "/") {
     return NextResponse.next();
   }
 
-  // Handle the /try-out redirect synchronously
-  if (request.url.includes("/try-out")) {
-    return NextResponse.redirect(
-      new URL("https://tryout.bangsoal.co.id", request.url),
-    );
+  // Allow maintenance page to be accessible
+  if (pathname === "/maintenance") {
+    return NextResponse.next();
   }
 
+  // Allow static assets and Next.js internal files
   const excludePaths = [
-    "/maintenance",
     "_next/static",
+    "_next/image",
+    "_next/webpack",
     "manifest",
     "icon",
-    "bg-mesh-horizontal.webp",
+    ".webp",
+    ".svg",
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".gif",
+    ".ico",
+    ".woff",
+    ".woff2",
+    ".ttf",
+    ".eot",
   ];
 
-  const shouldSkip = excludePaths.some((path) => request.url.includes(path));
+  const shouldSkip = excludePaths.some((path) => 
+    pathname.includes(path) || request.url.includes(path)
+  );
 
-  if (request.url.includes("/maintenance")) {
-    try {
-      if (!process.env.NEXT_PUBLIC_IS_MAINTENANCE) {
-        const available = await checkBackendServerAvailability(); // Ensure this is awaited
-
-        if (available) {
-          return NextResponse.redirect(
-            new URL(`${process.env.BASE_URL}/dashboard`, request.url),
-            {
-              status: 303,
-            },
-          );
-        }
-      } else {
-        return NextResponse.next();
-      }
-    } catch (error) {
-      console.error("Error checking backend server availability");
-      return NextResponse.next();
-    }
-  }
-
-  // Avoid redirecting the maintenance page to itself
-  if (shouldSkip || request.headers.get("referrer")?.includes("/maintenance")) {
+  if (shouldSkip) {
     return NextResponse.next();
-  } else {
-    try {
-      const available = await checkBackendServerAvailability(); // Ensure this is awaited
-
-      if (available) {
-        return NextResponse.next();
-      }
-    } catch (error) {
-      console.error("Error checking backend server availability");
-      return NextResponse.redirect(
-        new URL(`${process.env.BASE_URL}/maintenance`, request.url),
-        {
-          status: 303,
-        },
-      );
-    }
   }
 
-  return NextResponse.next();
+  // For all other paths, redirect to maintenance (since backend is not connected yet)
+  // Only landing page should be accessible
+  const baseUrl = process.env.BASE_URL || url.origin;
+  return NextResponse.redirect(
+    new URL("/maintenance", baseUrl),
+    {
+      status: 303,
+    },
+  );
 }

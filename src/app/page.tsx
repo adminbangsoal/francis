@@ -13,10 +13,12 @@ export default function Home() {
   const route = useRouter();
 
   useEffect(() => {
-    if (user.token) {
+    // Only redirect to dashboard if user has token AND backend is available
+    // For now, landing page should be accessible even without backend
+    if (user.token && process.env.NEXT_PUBLIC_API_URL) {
       route.push("/dashboard");
     }
-  }, [user.token]);
+  }, [user.token, route]);
 
   return (
     <main className="flex min-h-screen flex-col items-stretch">
