@@ -71,11 +71,27 @@ export const UploadCatatanForm = () => {
         uploadMedia({ file: acceptedCatatan[0] }),
         uploadMedia({ file: acceptedThumbnail[0] }),
       ]);
-      if ("data" in catatanResponse && "data" in thumbnailResponse) {
-        setValue("asset_url", catatanResponse.data.data.url);
+
+      // Type guard: check if both responses have data
+      const hasCatatanData =
+        "data" in catatanResponse &&
+        catatanResponse.data !== undefined &&
+        catatanResponse.data.data !== undefined;
+
+      const hasThumbnailData =
+        "data" in thumbnailResponse &&
+        thumbnailResponse.data !== undefined &&
+        thumbnailResponse.data.data !== undefined;
+
+      if (hasCatatanData && hasThumbnailData) {
+        // TypeScript now knows these are defined
+        const catatanUrl = catatanResponse.data!.data.url;
+        const thumbnailUrl = thumbnailResponse.data!.data.url;
+
+        setValue("asset_url", catatanUrl);
         const uploadedUrls = {
-          asset_url: catatanResponse.data.data.url,
-          thumbnail_url: thumbnailResponse.data.data.url,
+          asset_url: catatanUrl,
+          thumbnail_url: thumbnailUrl,
         };
         return uploadedUrls;
       }

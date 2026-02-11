@@ -22,7 +22,7 @@ const UploadButton = React.forwardRef<HTMLInputElement, UploadButtonProps>(
         uploadFile({
           file: props.submission as File,
         }).then((d) => {
-          if ("data" in d) {
+          if ("data" in d && d.data && d.data.data) {
             const { url } = d.data.data;
             props.setSubmissionsTask((prev) => {
               return {
@@ -36,7 +36,12 @@ const UploadButton = React.forwardRef<HTMLInputElement, UploadButtonProps>(
           }
         });
       }
-    }, [props.submission]);
+    }, [
+      props.submission,
+      uploadFile,
+      props.setSubmissionsTask,
+      props.taskNumber,
+    ]);
 
     useEffect(() => {
       if (isError) {

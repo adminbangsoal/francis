@@ -21,9 +21,6 @@ export default function ComingSoon() {
   const pathname = usePathname();
 
   const isAvailablePath = AVAILABLE_PATHS.some((path) => {
-    if (path instanceof RegExp) {
-      return path.test(pathname);
-    }
     return pathname === path;
   });
   useEffect(() => {

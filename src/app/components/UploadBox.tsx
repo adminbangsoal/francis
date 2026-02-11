@@ -44,8 +44,9 @@ export const UploadBox = ({
   };
 
   useEffect(() => {
-    setMyFiles(acceptedFiles);
-  }, [acceptedFiles]);
+    // Convert readonly FileWithPath[] to File[]
+    setMyFiles(acceptedFiles.map((file) => file as File));
+  }, [acceptedFiles, setMyFiles]);
   useEffect(() => {
     if (fileRejections.length > 0) {
       fileRejections.map(({ file, errors }) => {
