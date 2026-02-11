@@ -30,6 +30,11 @@ export default async function middleware(
     return NextResponse.next();
   }
 
+  // Allow coming-soon page to be accessible
+  if (pathname === "/coming-soon") {
+    return NextResponse.next();
+  }
+
   // Allow static assets and Next.js internal files
   const excludePaths = [
     "_next/static",
@@ -50,21 +55,18 @@ export default async function middleware(
     ".eot",
   ];
 
-  const shouldSkip = excludePaths.some((path) => 
-    pathname.includes(path) || request.url.includes(path)
+  const shouldSkip = excludePaths.some(
+    (path) => pathname.includes(path) || request.url.includes(path),
   );
 
   if (shouldSkip) {
     return NextResponse.next();
   }
 
-  // For all other paths, redirect to maintenance (since backend is not connected yet)
+  // For all other paths, redirect to coming-soon
   // Only landing page should be accessible
   const baseUrl = process.env.BASE_URL || url.origin;
-  return NextResponse.redirect(
-    new URL("/maintenance", baseUrl),
-    {
-      status: 303,
-    },
-  );
+  return NextResponse.redirect(new URL("/coming-soon", baseUrl), {
+    status: 303,
+  });
 }
