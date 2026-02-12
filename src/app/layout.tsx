@@ -1,5 +1,3 @@
-// components
-import ComingSoon from "./components/ComingSoon";
 // libs
 import type { Metadata } from "next";
 
@@ -84,7 +82,6 @@ export default function RootLayout({
       <body className={`relative bg-surface-100`}>
         <Toaster />
         <Providers>
-          <ComingSoon />
           <MainLayout>{children}</MainLayout>
         </Providers>
       </body>

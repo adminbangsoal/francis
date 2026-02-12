@@ -3,7 +3,6 @@
 import dayjs from "dayjs";
 import "dayjs/locale/id";
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
 import Footer from "./Footer";
 import Nav from "./Navbar";
 import {
@@ -37,16 +36,7 @@ export const MainLayout = ({ children }: MainLayoutI) => {
     CATATAN_PATH.test(pathname) ||
     CATATAN_BASE_PATH === pathname;
 
-  useEffect(() => {
-    // Only allow landing page - redirect all other pages to coming-soon
-    if (
-      pathname !== "/" &&
-      pathname !== "/maintenance" &&
-      pathname !== "/coming-soon"
-    ) {
-      window.location.href = "/coming-soon";
-    }
-  }, [pathname]);
+  // Coming soon redirect disabled - all paths are accessible
 
   return (
     <div className="relative">

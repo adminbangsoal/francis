@@ -1,36 +1,34 @@
 import {
-  OnboardPassword,
-  PasswordSignInRequest,
+  ForgotPasswordRequest,
+  GoogleSignInRequest,
+  LoginRequest,
   ProfileResponse,
-  SendMailOtpRequest,
-  SendOTPRequest,
-  SigninEmailRequest,
-  SigninRequest,
+  RegisterRequest,
+  ResetPasswordRequest,
   SigninResponse,
   SignupResponse,
-  VerifyMailOtpRequest,
 } from "@/types";
 import { baseApi } from "./baseApi";
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    login: builder.mutation<SigninResponse, SigninRequest>({
-      query: (body) => ({
-        url: "/auth/login",
-        method: "POST",
-        body,
-      }),
-    }),
-    register: builder.mutation<SignupResponse, SigninRequest>({
+    register: builder.mutation<SignupResponse, RegisterRequest>({
       query: (body) => ({
         url: "/auth/register",
         method: "POST",
         body,
       }),
     }),
-    sendOTP: builder.mutation<void, SendOTPRequest>({
+    login: builder.mutation<SigninResponse, LoginRequest>({
       query: (body) => ({
-        url: "/auth/send-otp",
+        url: "/auth/login",
+        method: "POST",
+        body,
+      }),
+    }),
+    googleSignIn: builder.mutation<SigninResponse, GoogleSignInRequest>({
+      query: (body) => ({
+        url: "/auth/google",
         method: "POST",
         body,
       }),
@@ -42,69 +40,19 @@ export const authApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Profile"],
     }),
-    passwordLogin: builder.mutation<SigninResponse, PasswordSignInRequest>({
-      query: (body) => ({
-        url: "/auth/password-login",
-        method: "POST",
-        body,
-      }),
-    }),
-    onboardPassword: builder.mutation<ProfileResponse, OnboardPassword>({
-      query: (body) => ({
-        url: "/auth/onboard-password",
-        method: "POST",
-        body,
-      }),
-      invalidatesTags: ["DashboardProfile"],
-    }),
-    forgotPassword: builder.mutation<SigninResponse, SigninRequest>({
+    forgotPassword: builder.mutation<
+      { message: string },
+      ForgotPasswordRequest
+    >({
       query: (body) => ({
         url: "/auth/forgot-password",
         method: "POST",
         body,
       }),
     }),
-    sendOtpResetPassword: builder.mutation<void, SendOTPRequest>({
+    resetPassword: builder.mutation<{ message: string }, ResetPasswordRequest>({
       query: (body) => ({
-        url: "/auth/otp-reset",
-        method: "POST",
-        body,
-      }),
-    }),
-    sendMailOtp: builder.mutation<void, SendMailOtpRequest>({
-      query: (body) => ({
-        url: "/auth/mail-verification",
-        method: "POST",
-        body,
-      }),
-    }),
-    verifyMailOtp: builder.mutation<SigninResponse, VerifyMailOtpRequest>({
-      query: (body) => ({
-        url: "/auth/verify-mail",
-        method: "POST",
-        body,
-      }),
-    }),
-    loginEmail: builder.mutation<SigninResponse, SigninEmailRequest>({
-      query: (body) => ({
-        url: "/auth/login-email",
-        method: "POST",
-        body,
-      }),
-    }),
-    forgotPasswordEmail: builder.mutation<SigninResponse, SendMailOtpRequest>({
-      query: (body) => ({
-        url: "/auth/forgot-password-email",
-        method: "POST",
-        body,
-      }),
-    }),
-    verifyForgotPasswordOtp: builder.mutation<
-      SigninResponse,
-      VerifyMailOtpRequest
-    >({
-      query: (body) => ({
-        url: "/auth/otp-reset-email",
+        url: "/auth/reset-password",
         method: "POST",
         body,
       }),
@@ -113,16 +61,10 @@ export const authApi = baseApi.injectEndpoints({
 });
 
 export const {
+  useRegisterMutation,
   useLoginMutation,
-  useSendOTPMutation,
+  useGoogleSignInMutation,
   useGetProfileQuery,
-  usePasswordLoginMutation,
-  useOnboardPasswordMutation,
   useForgotPasswordMutation,
-  useSendOtpResetPasswordMutation,
-  useSendMailOtpMutation,
-  useVerifyMailOtpMutation,
-  useLoginEmailMutation,
-  useForgotPasswordEmailMutation,
-  useVerifyForgotPasswordOtpMutation,
+  useResetPasswordMutation,
 } = authApi;

@@ -123,8 +123,7 @@ export const SigninFormSchema = z.object({
         message: "Email tidak valid",
       },
     ),
-  password: z.string().optional(),
-  phone_number: phone_number.optional(),
+  password: z.string().min(6, { message: "Password minimal 6 karakter" }),
 });
 
 export const onboardingFormSchema = z.object({

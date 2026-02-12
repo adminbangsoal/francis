@@ -9,25 +9,21 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
+import { auth, googleProvider } from "@/lib/firebase";
 import {
-  useForgotPasswordEmailMutation,
   useForgotPasswordMutation,
-  useLoginEmailMutation,
-  useSendMailOtpMutation,
-  useSendOtpResetPasswordMutation,
-  useVerifyForgotPasswordOtpMutation,
-  useVerifyMailOtpMutation,
+  useGoogleSignInMutation,
+  useLoginMutation,
 } from "@/redux/api/authApi";
 import { SigninFormSchema } from "@/types/schema/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { setCookie } from "cookies-next";
-import dayjs from "dayjs";
-import { redirect, usePathname } from "next/navigation";
+import { signInWithPopup } from "firebase/auth";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 import { z } from "zod";
 import { InfiniteSlider } from "../../components/InfiniteSlider";
-import { OTPInput } from "../../components/OTPInput";
 import { SIGNUP_COPYWRITING, UNI_LOGOS } from "./constants";
 
 interface ResetPasswordStep {
@@ -40,169 +36,111 @@ export const SignInForm = ({
   setResetPasswordStep,
 }: ResetPasswordStep) => {
   const pathname = usePathname();
-
-  const [passwordLoginModal, setPasswordLoginModal] = useState<boolean>(false);
-
-  const [phoneNumberLoginModal, setPhoneNumberLoginModal] =
-    useState<boolean>(false);
-
   const isLogin = pathname == "/login";
-  const [otpValue, setOtpValue] = useState<string>("");
-  const [showOTPInput, setShowOTPInput] = useState<boolean>(false);
+  const [forgotPasswordModal, setForgotPasswordModal] =
+    useState<boolean>(false);
+  const [resetPasswordSent, setResetPasswordSent] = useState<boolean>(false);
 
   const form = useForm<z.infer<typeof SigninFormSchema>>({
     resolver: zodResolver(SigninFormSchema),
     defaultValues: {
       email: "",
+      password: "",
     },
   });
 
   const { handleSubmit } = form;
 
-  const [isForgotPasswordEmail, setIsForgotPasswordEmail] =
-    useState<boolean>(false);
   const [
-    sendEmailOTP,
+    login,
     {
-      isSuccess: isEmailOtpSuccess,
-      isLoading: isOtpEmailLoading,
-      error: emailOtpError,
-      isError: isEmailOtpError,
+      isSuccess: isLoginSuccess,
+      data: loginData,
+      isLoading: isLoginLoading,
+      error: loginError,
     },
-  ] = useSendMailOtpMutation();
-  const [
-    verifyEmailOtp,
-    { isSuccess: isVerifyEmailOtpSuccess, error, isError },
-  ] = useVerifyMailOtpMutation();
-  const [loginEmailUser, { isSuccess: isLoginEmailUserSuccess, data }] =
-    useLoginEmailMutation();
+  ] = useLoginMutation();
 
   const [
-    sendForgotPasswordEmail,
+    googleSignIn,
     {
-      isSuccess: isSendForgotPasswordEmailSuccess,
-      reset: resetForgotPasswordEmail,
+      isSuccess: isGoogleSignInSuccess,
+      data: googleData,
+      isLoading: isGoogleSignInLoading,
     },
-  ] = useForgotPasswordEmailMutation();
-  const [
-    verifyForgotPasswordEmailOtp,
-    {
-      isSuccess: isVerifyForgotPasswordEmailOtpSuccess,
-      reset: resetVerifyForgotPasswordEmailOtp,
-    },
-  ] = useVerifyForgotPasswordOtpMutation();
+  ] = useGoogleSignInMutation();
 
   const [
-    sendOTPReset,
-    {
-      isSuccess: isSendOtpResetSuccess,
-      isLoading: isOtpResetLoading,
-      error: otpResetError,
-      reset,
-    },
-  ] = useSendOtpResetPasswordMutation();
-
-  const [
-    forgotPasswordMutation,
+    forgotPassword,
     { isSuccess: isForgotPasswordSuccess, isLoading: isForgotPasswordLoading },
   ] = useForgotPasswordMutation();
 
   const onSubmitForm = async (values: z.infer<typeof SigninFormSchema>) => {
-    if (!showOTPInput) {
-      setCookie("email", values.email, {
-        expires: dayjs().add(2, "hour").toDate(),
-      });
-      await sendEmailOTP({ email: values.email });
-    } else {
-      const body = { ...values, otp: otpValue };
-      if (isLogin) {
-        await verifyEmailOtp(body);
+    if (!values.password) {
+      form.setError("password", { message: "Password harus diisi" });
+      return;
+    }
+
+    await login({
+      email: values.email,
+      password: values.password,
+    });
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      // Check if Firebase config is available
+      if (!process.env.NEXT_PUBLIC_FIREBASE_API_KEY) {
+        toast.error(
+          "Firebase belum dikonfigurasi. Silakan set environment variables.",
+        );
+        return;
       }
-    }
-  };
 
-  useEffect(() => {
-    if (isEmailOtpSuccess) {
-      setShowOTPInput(true);
-    }
-    if (isVerifyEmailOtpSuccess) {
-      redirect("/onboarding");
-    }
-  }, [isVerifyEmailOtpSuccess, isEmailOtpSuccess]);
+      // Sign in with Google using Firebase
+      const result = await signInWithPopup(auth, googleProvider);
+      const idToken = await result.user.getIdToken();
 
-  useEffect(() => {
-    if (!passwordLoginModal && !phoneNumberLoginModal) {
-      reset();
-      setOtpValue("");
-      setShowOTPInput(false);
-      form.reset();
-      setIsForgotPasswordEmail(false);
-      resetForgotPasswordEmail();
-    }
-  }, [passwordLoginModal, phoneNumberLoginModal]);
-
-  const onSubmitLoginPasswordForm = async (
-    values: z.infer<typeof SigninFormSchema>,
-  ) => {
-    if (isForgotPasswordEmail) {
-      // Mixpanel.track("Submit Forgot Password OTP", { email: values.email });
-      await verifyForgotPasswordEmailOtp({
-        email: values.email,
-        otp: otpValue,
-      });
-    } else {
-      // Mixpanel.track("Submit Login Email", { email: values.email });
-      await loginEmailUser({
-        email: values.email,
-        password: values.password as string,
-      });
-    }
-  };
-
-  useEffect(() => {
-    if (isLoginEmailUserSuccess) {
-      if (!data?.data.user.onboard_date) {
-        redirect("/onboarding");
+      // Send ID token to backend
+      await googleSignIn({ idToken });
+    } catch (error: any) {
+      console.error("Google Sign In error:", error);
+      if (error.code === "auth/popup-closed-by-user") {
+        toast.error("Popup ditutup. Silakan coba lagi.");
+      } else if (error.code === "auth/popup-blocked") {
+        toast.error("Popup diblokir. Silakan izinkan popup untuk domain ini.");
       } else {
-        redirect("/dashboard");
+        toast.error(
+          `Google Sign In gagal: ${error.message || "Terjadi kesalahan"}`,
+        );
       }
     }
+  };
 
-    if (isForgotPasswordSuccess || isVerifyForgotPasswordEmailOtpSuccess) {
-      redirect("/dashboard");
+  const handleForgotPassword = async () => {
+    const email = form.getValues("email");
+    if (!email) {
+      form.setError("email", {
+        message: "Email harus diisi untuk reset password",
+      });
+      return;
     }
-  }, [
-    isEmailOtpSuccess,
-    isForgotPasswordSuccess,
-    isLoginEmailUserSuccess,
-    isVerifyForgotPasswordEmailOtpSuccess,
-  ]);
-
-  useEffect(() => {
-    if (isEmailOtpError) {
-      if (
-        (emailOtpError as any)?.status == 405 ||
-        (emailOtpError as any)?.status == 406
-      ) {
-        setPasswordLoginModal(true);
-      }
-    }
-  }, [isEmailOtpError]);
+    await forgotPassword({ email });
+    setResetPasswordSent(true);
+  };
 
   useEffect(() => {
-    if (!passwordLoginModal) {
-      resetVerifyForgotPasswordEmailOtp();
-      setIsForgotPasswordEmail(false);
-      reset();
-      setResetPasswordStep(0);
+    if (isForgotPasswordSuccess) {
+      setResetPasswordSent(true);
     }
-  }, [passwordLoginModal]);
+  }, [isForgotPasswordSuccess]);
 
+  // Reset form error when modal closes
   useEffect(() => {
-    if (isSendOtpResetSuccess) {
-      setResetPasswordStep(1);
+    if (!forgotPasswordModal) {
+      setResetPasswordSent(false);
     }
-  }, [isSendOtpResetSuccess]);
+  }, [forgotPasswordModal]);
 
   return (
     <div className="mx-5 flex h-full flex-col justify-center gap-10 md:mx-16 lg:flex-row lg:items-center lg:pt-10">
@@ -216,13 +154,13 @@ export const SignInForm = ({
               <div className="rounded-2xl bg-white py-8 md:py-16">
                 <div className="flex min-h-[420px] skew-x-12 flex-col items-center justify-center gap-3 px-10 py-4 md:h-auto md:gap-6 lg:min-h-[550px] lg:gap-10">
                   <div className="flex flex-col gap-2 text-center lg:-mt-20">
-                    <p className="ml-8 text-2xl font-bold text-gray-950 md:ml-6 lg:text-4xl">
+                    <p className="mx-8 text-2xl font-bold text-gray-950 md:mx-6 lg:text-4xl">
                       {
                         SIGNUP_COPYWRITING[isLogin ? "login" : "register"]
                           .header
                       }
                     </p>
-                    <p className="ml-6 text-gray-500 md:ml-6 lg:text-lg">
+                    <p className="mx-6 text-gray-500 md:mx-6 lg:text-lg">
                       {
                         SIGNUP_COPYWRITING[isLogin ? "login" : "register"]
                           .caption
@@ -231,53 +169,99 @@ export const SignInForm = ({
                   </div>
 
                   <div className="w-full">
-                    <div className="mt-4 flex w-full flex-col gap-5">
-                      {showOTPInput ? (
-                        <div className="mt-0 flex md:justify-center">
-                          <OTPInput
-                            heading={"Cek email masuk (inbox) dan spam Anda"}
-                            setValue={setOtpValue}
-                            errorMesage={(error as any)?.data?.error?.message}
-                          />
-                        </div>
-                      ) : (
-                        <div className="-ml-4 mr-1 md:-ml-4 md:mr-2">
-                          <FormField
-                            control={form.control}
-                            name="email"
-                            render={({ field }) => (
-                              <FormItem>
-                                <Input
-                                  type="email"
-                                  placeholder="Email"
-                                  {...field}
-                                />
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-                      )}
+                    <div className="mt-4 flex w-full flex-col items-center gap-5">
+                      <div className="w-full max-w-md">
+                        <FormField
+                          control={form.control}
+                          name="email"
+                          render={({ field }) => (
+                            <FormItem>
+                              <Input
+                                type="email"
+                                placeholder="Email"
+                                {...field}
+                              />
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <div className="w-full max-w-md">
+                        <FormField
+                          control={form.control}
+                          name="password"
+                          render={({ field }) => (
+                            <FormItem>
+                              <Input
+                                type="password"
+                                placeholder="Password"
+                                {...field}
+                              />
+                              <FormMessage />
+                              {loginError && (
+                                <p className="mt-2 text-xs font-bold text-red-700">
+                                  {(loginError as any)?.data?.error?.message ||
+                                    "Email atau password salah"}
+                                </p>
+                              )}
+                            </FormItem>
+                          )}
+                        />
+                      </div>
                       <div className="flex justify-center">
                         <Button
                           type="button"
-                          onClick={async () => {
-                            setPhoneNumberLoginModal(true);
-                            // Mixpanel.track("Forgot Email");
-                          }}
+                          onClick={() => setForgotPasswordModal(true)}
                           variant="link"
                           className="flex w-fit text-center text-sm lg:mr-6"
                         >
-                          Lupa email terdaftar?
+                          Lupa password?
                         </Button>
                       </div>
                       <Button
                         onClick={handleSubmit(onSubmitForm)}
                         variant={"bsPrimary"}
-                        className="-ml-6 mr-2 rounded-full md:-ml-8 md:mr-4"
-                        loading={isOtpEmailLoading}
+                        className="w-full max-w-md rounded-full"
+                        loading={isLoginLoading}
                       >
-                        {showOTPInput ? "Submit" : "Lanjut"}
+                        Masuk
+                      </Button>
+                      <div className="relative w-full max-w-md">
+                        <div className="absolute inset-0 flex items-center">
+                          <span className="w-full border-t" />
+                        </div>
+                        <div className="relative flex justify-center text-xs uppercase">
+                          <span className="text-muted-foreground bg-white px-2">
+                            Atau
+                          </span>
+                        </div>
+                      </div>
+                      <Button
+                        type="button"
+                        onClick={handleGoogleSignIn}
+                        variant="outline"
+                        className="w-full max-w-md rounded-full"
+                        loading={isGoogleSignInLoading}
+                      >
+                        <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
+                          <path
+                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                            fill="#4285F4"
+                          />
+                          <path
+                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                            fill="#34A853"
+                          />
+                          <path
+                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                            fill="#FBBC05"
+                          />
+                          <path
+                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                            fill="#EA4335"
+                          />
+                        </svg>
+                        Masuk dengan Google
                       </Button>
                     </div>
                   </div>
@@ -285,130 +269,58 @@ export const SignInForm = ({
               </div>
             </div>
           </div>
-          <Modal open={passwordLoginModal} setOpen={setPasswordLoginModal}>
-            {resetPasswordStep == 0 && (
+          <Modal open={forgotPasswordModal} setOpen={setForgotPasswordModal}>
+            {resetPasswordSent ? (
               <>
-                {isSendForgotPasswordEmailSuccess ? (
-                  <div className="flex md:justify-center">
-                    <OTPInput
-                      heading={"Cek email masuk (inbox) dan spam Anda"}
-                      setValue={setOtpValue}
-                    />
-                  </div>
-                ) : (
-                  <>
-                    <h2 className="text-2xl font-bold">
-                      Masuk menggunakan password anda
-                    </h2>
-                    <FormField
-                      control={form.control}
-                      name="password"
-                      render={({ field }) => (
-                        <FormItem>
-                          <div>
-                            <Input
-                              type="password"
-                              placeholder="Password"
-                              {...field}
-                            />
-                          </div>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        setIsForgotPasswordEmail(true);
-                        await sendForgotPasswordEmail({
-                          email: form.getValues("email"),
-                        });
-                      }}
-                      className="overflow flex h-fit w-fit justify-start text-sm underline"
-                    >
-                      Lupa Password? Kirim OTP via email untuk reset
-                    </button>
-                  </>
-                )}
+                <h2 className="text-2xl font-bold">
+                  Email Reset Password Terkirim
+                </h2>
+                <p className="mt-4 text-gray-600">
+                  Kami telah mengirimkan link reset password ke email Anda.
+                  Silakan cek inbox dan folder spam Anda.
+                </p>
+                <p className="mt-2 text-sm text-gray-500">
+                  Link reset password berlaku selama 1 jam.
+                </p>
                 <Button
-                  onClick={handleSubmit(onSubmitLoginPasswordForm)}
-                  variant={"bsPrimary"}
-                  className="mb-2 mt-4"
-                  loading={isOtpResetLoading || isForgotPasswordLoading}
-                >
-                  Masuk
-                </Button>
-              </>
-            )}
-          </Modal>
-          <Modal
-            open={phoneNumberLoginModal}
-            setOpen={setPhoneNumberLoginModal}
-          >
-            {resetPasswordStep == 1 ? (
-              <>
-                <h2 className="text-2xl font-bold">Masuk Menggunakan OTP</h2>
-                <div className="flex md:justify-center">
-                  <OTPInput setValue={setOtpValue} />
-                </div>
-                <Button
-                  type="button"
-                  onClick={async () => {
-                    const values = form.getValues();
-                    // Mixpanel.track("Clicked Forgot Password", {
-                    //   email: values.email,
-                    // });
-                    await forgotPasswordMutation({
-                      phone_number: `+62${values.phone_number?.slice(1)}`,
-                      otp: otpValue,
-                    });
+                  onClick={() => {
+                    setForgotPasswordModal(false);
+                    setResetPasswordSent(false);
                   }}
                   variant={"bsPrimary"}
-                  className="mb-2"
-                  loading={isOtpResetLoading || isForgotPasswordLoading}
+                  className="mb-2 mt-4"
                 >
-                  Masuk
+                  Tutup
                 </Button>
               </>
             ) : (
               <>
+                <h2 className="text-2xl font-bold">Lupa Password</h2>
+                <p className="mt-2 text-gray-600">
+                  Masukkan email Anda dan kami akan mengirimkan link reset
+                  password.
+                </p>
                 <FormField
                   control={form.control}
-                  name="phone_number"
+                  name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <div>
-                        <FormLabel required>Nomor Whatsapp Terdaftar</FormLabel>
-                        <Input
-                          className="mb-2 mt-2"
-                          type="number"
-                          placeholder="Nomor Whatsapp"
-                          {...field}
-                        />
-                        <p className="mt-2 text-xs font-bold text-red-700">
-                          {(error as any)?.data?.error?.message}
-                        </p>
-                        <Button
-                          type="button"
-                          onClick={async () => {
-                            const phoneNumber = form
-                              .getValues("phone_number")
-                              ?.slice(1);
-                            await sendOTPReset({
-                              phone_number: `+62${phoneNumber}`,
-                            });
-                          }}
-                          variant="bsPrimary"
-                          className="mt-4 w-full"
-                          loading={isOtpResetLoading}
-                        >
-                          Kirim OTP
-                        </Button>
+                      <div className="mt-4">
+                        <FormLabel>Email</FormLabel>
+                        <Input type="email" placeholder="Email" {...field} />
                       </div>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+                <Button
+                  onClick={handleForgotPassword}
+                  variant={"bsPrimary"}
+                  className="mb-2 mt-4"
+                  loading={isForgotPasswordLoading}
+                >
+                  Kirim Link Reset Password
+                </Button>
               </>
             )}
           </Modal>

@@ -35,19 +35,20 @@ export const rtkQueryErrorLogger: Middleware =
         window.location.href = window.location.origin + "/try-out";
       }
 
-      if (action.meta.arg.endpointName == "getProfile") {
+      if (action.meta?.arg?.endpointName == "getProfile") {
         return;
       } else if (
         action?.payload.status == 401 &&
-        action.meta.arg.endpointName != "sendOTP" &&
-        action.meta.arg.endpointName != "passwordLogin" &&
-        action.meta.arg.endpointName != "sendOtpResetPassword" &&
-        action.meta.arg.endpointName != "verifyMailOtp" &&
-        action.meta.arg.endpointName != "loginEmail" &&
-        action.meta.arg.endpointName != "forgotPassword" &&
-        action.meta.arg.endpointName != "getTOHistoryQuestionAnalytics"
+        action.meta?.arg?.endpointName != "sendOTP" &&
+        action.meta?.arg?.endpointName != "passwordLogin" &&
+        action.meta?.arg?.endpointName != "sendOtpResetPassword" &&
+        action.meta?.arg?.endpointName != "verifyMailOtp" &&
+        action.meta?.arg?.endpointName != "loginEmail" &&
+        action.meta?.arg?.endpointName != "forgotPassword" &&
+        action.meta?.arg?.endpointName != "getTOHistoryQuestionAnalytics"
       ) {
         api.dispatch(logout());
+        return;
       } else if (
         action?.payload.status == 405 ||
         action?.payload.status == 406
@@ -68,7 +69,7 @@ export const rtkQueryErrorLogger: Middleware =
         console.error(action?.payload?.data?.error?.message);
         // prevent toast
       } else {
-        if (action.meta.arg.endpointName == "sendOtpResetPassword") {
+        if (action.meta?.arg?.endpointName == "sendOtpResetPassword") {
           // dont return toast
         } else {
           const errorData =

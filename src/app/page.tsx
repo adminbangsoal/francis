@@ -2,7 +2,6 @@
 import { useAppSelector } from "@/redux/store";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import FloatingCountdown from "./components/FloatingCountdown";
 import Comparison from "./components/SectionComparison";
 import Features from "./components/SectionFeatures";
 import Hero from "./components/SectionHero";
@@ -29,7 +28,7 @@ export default function Home() {
       {/* <Testimonials /> */}
       <Pricing />
       <SignUp />
-      <FloatingCountdown />
+      {/* <FloatingCountdown /> */}
     </main>
   );
 }
