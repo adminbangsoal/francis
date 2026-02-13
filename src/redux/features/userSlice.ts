@@ -37,7 +37,10 @@ const userSlice = createSlice({
       (state, { payload }: PayloadAction<SigninResponse>) => {
         const token = payload.data.token;
         state.token = token;
-        state.profile = payload.data.user;
+        state.profile = {
+          ...payload.data.user,
+          profile_img: payload.data.user.profile_picture || "",
+        };
         if (!payload.data.user.onboard_date) {
           window.location.pathname = "/onboarding";
         } else {
@@ -50,7 +53,10 @@ const userSlice = createSlice({
       (state, { payload }: PayloadAction<SigninResponse>) => {
         const token = payload.data.token;
         state.token = token;
-        state.profile = payload.data.user;
+        state.profile = {
+          ...payload.data.user,
+          profile_img: payload.data.user.profile_picture || "",
+        };
         if (!payload.data.user.onboard_date) {
           window.location.pathname = "/onboarding";
         } else {
@@ -63,7 +69,10 @@ const userSlice = createSlice({
       (state, { payload }: PayloadAction<SignupResponse>) => {
         const token = payload.data.token;
         state.token = token;
-        state.profile = payload.data.user;
+        state.profile = {
+          ...payload.data.user,
+          profile_img: payload.data.user.profile_picture || "",
+        };
         // User baru akan redirect ke onboarding
         window.location.pathname = "/onboarding";
       },
