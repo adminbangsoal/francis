@@ -38,11 +38,22 @@ const nextConfig = {
   async headers() {
     return [
       {
+        // Apply to langganan page and all sub-paths
+        source: "/langganan/:path*",
+        headers: [
+          {
+            key: "Content-Security-Policy",
+            value: "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://snap-assets.al-pc-id-b.cdn.gtflabs.io https://api.sandbox.midtrans.com https://app.sandbox.midtrans.com https://pay.google.com https://js-agent.newrelic.com https://bam.nr-data.net https://gwk.gopayapi.com https://www.googletagmanager.com 'sha256-v8V2Y+fbkBMghFEm+ALwcLXqYbjG/N9246T4W4pt1JM='; object-src 'none'; frame-src 'self' https://app.sandbox.midtrans.com;",
+          },
+        ],
+      },
+      {
+        // Also apply to exact /langganan path
         source: "/langganan",
         headers: [
           {
             key: "Content-Security-Policy",
-            value: "script-src 'self' 'unsafe-eval' https://snap-assets.al-pc-id-b.cdn.gtflabs.io https://api.sandbox.midtrans.com https://app.sandbox.midtrans.com https://pay.google.com https://js-agent.newrelic.com https://bam.nr-data.net https://gwk.gopayapi.com 'sha256-v8V2Y+fbkBMghFEm+ALwcLXqYbjG/N9246T4W4pt1JM='; object-src 'none';",
+            value: "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://snap-assets.al-pc-id-b.cdn.gtflabs.io https://api.sandbox.midtrans.com https://app.sandbox.midtrans.com https://pay.google.com https://js-agent.newrelic.com https://bam.nr-data.net https://gwk.gopayapi.com https://www.googletagmanager.com 'sha256-v8V2Y+fbkBMghFEm+ALwcLXqYbjG/N9246T4W4pt1JM='; object-src 'none'; frame-src 'self' https://app.sandbox.midtrans.com;",
           },
         ],
       },
