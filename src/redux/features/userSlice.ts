@@ -1,5 +1,6 @@
 import { ProfileResponse, SigninResponse, SignupResponse, User } from "@/types";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { setCookie } from "cookies-next";
 import storage from "redux-persist/lib/storage";
 import { authApi } from "../api/authApi";
 
@@ -41,6 +42,10 @@ const userSlice = createSlice({
           ...payload.data.user,
           profile_img: payload.data.user.profile_picture || "",
         };
+        // Set email cookie for onboarding page
+        setCookie("email", payload.data.user.email, {
+          maxAge: 60 * 60 * 24, // 24 hours
+        });
         if (!payload.data.user.onboard_date) {
           window.location.pathname = "/onboarding";
         } else {
@@ -57,6 +62,10 @@ const userSlice = createSlice({
           ...payload.data.user,
           profile_img: payload.data.user.profile_picture || "",
         };
+        // Set email cookie for onboarding page
+        setCookie("email", payload.data.user.email, {
+          maxAge: 60 * 60 * 24, // 24 hours
+        });
         if (!payload.data.user.onboard_date) {
           window.location.pathname = "/onboarding";
         } else {
@@ -73,6 +82,10 @@ const userSlice = createSlice({
           ...payload.data.user,
           profile_img: payload.data.user.profile_picture || "",
         };
+        // Set email cookie for onboarding page
+        setCookie("email", payload.data.user.email, {
+          maxAge: 60 * 60 * 24, // 24 hours
+        });
         // User baru akan redirect ke onboarding
         window.location.pathname = "/onboarding";
       },
