@@ -5,11 +5,11 @@ import { cn } from "@/lib/utils";
 import { useAppSelector } from "@/redux/store";
 import { QueryParams } from "@/types";
 import * as Tabs from "@radix-ui/react-tabs";
+import { useRouter } from "next/navigation";
 import Nav from "../components/Navbar";
 import withAuth from "../components/withAuth";
 import { ProfileSettings } from "./elements/ProfileSettings";
 import RiwayatSection from "./elements/RiwayatSections";
-import TryoutHistorySection from "./elements/TryoutHistory/TryoutHistorySection";
 import { Catatanmu } from "./latihan-soal/Catatanmu";
 import { LatihanSoalSettings } from "./latihan-soal/LatihanSoalSettings";
 import { tabsTriggerStyle } from "./style";
@@ -17,6 +17,7 @@ import { tabsTriggerStyle } from "./style";
 const DashboardContent = ({ searchParams }: { searchParams: QueryParams }) => {
   const user = useAppSelector((state) => state.user);
   const { isDesktopBreakpoint } = useWindowsBreakpoints();
+  const router = useRouter();
 
   return (
     <>
@@ -45,7 +46,11 @@ const DashboardContent = ({ searchParams }: { searchParams: QueryParams }) => {
             <Tabs.Trigger className={cn(tabsTriggerStyle)} value="catatan">
               Catatanmu
             </Tabs.Trigger>
-            <Tabs.Trigger className={cn(tabsTriggerStyle)} value="try-out">
+            <Tabs.Trigger
+              className={cn(tabsTriggerStyle)}
+              value="try-out"
+              onClick={() => router.push("/coming-soon/tryout-akbar")}
+            >
               Try Out
             </Tabs.Trigger>
             <Tabs.Trigger className={cn(tabsTriggerStyle)} value="riwayat">
@@ -60,9 +65,6 @@ const DashboardContent = ({ searchParams }: { searchParams: QueryParams }) => {
           </Tabs.Content>
           <Tabs.Content value="latihan-soal">
             <LatihanSoalSettings />
-          </Tabs.Content>
-          <Tabs.Content value="try-out">
-            <TryoutHistorySection />
           </Tabs.Content>
           <Tabs.Content value="riwayat">
             <RiwayatSection />

@@ -88,7 +88,7 @@ export default function NavMenuMobile() {
             </AccordionItem>
           </Accordion>
           <Link
-            href="/try-out"
+            href="/coming-soon/tryout-akbar"
             className={cn(buttonVariants({ variant: "link" }), "text-base")}
           >
             Try out

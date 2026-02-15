@@ -41,7 +41,7 @@ export default function NavMenuDesktop() {
             </NavigationMenuContent>
           </NavigationMenuItem>
           <NavigationMenuItem>
-            <Link href="/try-out" legacyBehavior passHref>
+            <Link href="/coming-soon/tryout-akbar" legacyBehavior passHref>
               <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                 Try out
               </NavigationMenuLink>
