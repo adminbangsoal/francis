@@ -16,10 +16,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useLatihanSoalContext } from "../context";
-import PembahasanContainer from "./PembahasanContainer";
 import QuestionNavigator from "./QuestionNavigator";
-import QuestionTable from "./QuestionTable";
-import RenderMarkdown from "./RenderMarkdown";
 import { OptionBoxVariants, correctChoice, wrongChoice } from "./style";
 
 const QuestionFillIn = dynamic(() => import("./QuestionFillIn"), {
@@ -29,6 +26,34 @@ const QuestionFillIn = dynamic(() => import("./QuestionFillIn"), {
       <div className="skeleton relative mt-2 h-9 w-full rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
       <div className="skeleton relative mt-2 h-9 w-full rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
       <div className="skeleton relative mt-2 h-9 w-full rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
+    </div>
+  ),
+});
+
+const RenderMarkdown = dynamic(() => import("./RenderMarkdown"), {
+  ssr: false,
+  loading: () => (
+    <div className="skeleton relative h-6 w-full rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
+  ),
+});
+
+const PembahasanContainer = dynamic(() => import("./PembahasanContainer"), {
+  ssr: false,
+  loading: () => (
+    <div className="relative mb-10 rounded-xl border-2 border-gray-200 px-6 pb-10 pt-4">
+      <div className="skeleton relative h-4 w-24 rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300 mb-4"></div>
+      <div className="skeleton relative h-32 w-full rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
+    </div>
+  ),
+});
+
+const QuestionTable = dynamic(() => import("./QuestionTable"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex flex-col gap-y-3">
+      <div className="skeleton relative h-9 w-full rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
+      <div className="skeleton relative h-9 w-full rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
+      <div className="skeleton relative h-9 w-full rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
     </div>
   ),
 });

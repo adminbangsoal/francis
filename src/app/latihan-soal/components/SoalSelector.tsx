@@ -7,13 +7,7 @@ import { AutoSizer, List } from "react-virtualized";
 import { useLatihanSoalContext } from "../context";
 import { SoalSelectorI } from "./interface";
 
-function loading(promise: any) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, 2000);
-  }).then(() => promise);
-}
-
-const MarkdownPreview = lazy(() => loading(import("./RenderMarkdown"))); // Lazy load markdown for better performance
+const MarkdownPreview = lazy(() => import("./RenderMarkdown")); // Lazy load markdown for better performance
 
 export default function SoalSelector({
   subject_id,

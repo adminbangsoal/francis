@@ -17,10 +17,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useDropzone } from "react-dropzone";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
-import RenderMarkdown from "./RenderMarkdown";
+import dynamic from "next/dynamic";
+
+const RenderMarkdown = dynamic(() => import("./RenderMarkdown"), {
+  ssr: false,
+  loading: () => (
+    <div className="skeleton relative h-6 w-full rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300 mb-2"></div>
+  ),
+});
 const PembahasanContainer = ({
   data,
   // attemptId,
@@ -34,19 +40,9 @@ const PembahasanContainer = ({
     },
   });
 
-  const { getRootProps, getInputProps, isDragAccept, acceptedFiles } =
-    useDropzone({
-      accept: {
-        "image/jpeg": [".jpeg"],
-        "image/png": [".png"],
-        "image/jpg": [".jpg"],
-      },
-    });
-
   const [pembahasan, setPembahasan] = useState<Pembahasan | string>(
     data.correct_answer,
   );
-  const [acceptedImages, setAcceptedImage] = useState<File[]>([]);
   const { slug } = useParams();
 
   const { data: feedbackData, isSuccess } = useGetFeedbackQuery(
@@ -65,22 +61,10 @@ const PembahasanContainer = ({
   const [mutateAddFeedback] = useAddFeedbackMutation();
   const [mutateUpdateFeedback, { isSuccess: isMutateFeedbackSuccess, reset }] =
     useUpdateFeedbackMutation();
-  const [mutateSubmissionAsset] = useAddSubmissionAssetMutation();
 
   const isUserEligable = typeof pembahasan !== "string";
 
   const [isLiked, setIsLiked] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    if (acceptedFiles.length > 0) {
-      // mutateSubmissionAsset({
-      //   attempt_id: attemptId as string,
-      //   file: acceptedFiles[0],
-      // });
-
-      setAcceptedImage([...acceptedImages, ...acceptedFiles]);
-    }
-  }, [acceptedFiles]);
 
   useEffect(() => {
     if (
