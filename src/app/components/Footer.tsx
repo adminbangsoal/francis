@@ -102,7 +102,7 @@ export default function Footer() {
                   Leaderboard
                 </Link>
                 <Link
-                  href="https://wa.me/6282336666530?text=Haloo%20BangSoal!"
+                  href="https://wa.me/6287808417027?text=Haloo%20Bang Admin!"
                   className={cn(buttonVariants({ variant: "link" }), "text-sm")}
                 >
                   Hubungi Kami

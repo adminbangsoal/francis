@@ -81,7 +81,7 @@ export default function NavMenuDesktop() {
               // onClick={() => {
               //   Mixpanel.track("Clicked hubungi kami navbar");
               // }}
-              href="https://wa.me/6282336666530?text=Haloo%20BangSoal!"
+              href="https://wa.me/6287808417027?text=Haloo%20Bang Admin!"
               legacyBehavior
               passHref
             >

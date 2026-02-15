@@ -43,7 +43,7 @@ export const ProfileSettings = () => {
           // Mixpanel.identify(profile?.full_name as string);
           // Mixpanel.track("Clicked Hubungi Kami");
         }}
-        href="https://wa.me/6282336666530?text=Haloo%20BangSoal!"
+        href="https://wa.me/6287808417027?text=Haloo%20Bang Admin!"
         target="_blank"
         className={cn(
           buttonVariants({
