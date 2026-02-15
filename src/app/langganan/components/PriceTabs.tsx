@@ -36,14 +36,14 @@ export default function PriceTab({
           </div>
           <div className="flex flex-col items-center gap-3 sm:flex-row">
             <h2 className="text-4xl font-700 text-content-100 lg:text-5xl">
-              Rp24.000
+              Rp24.999
             </h2>
             <p className="shrink-0 text-xl font-700 opacity-70">/ bulan</p>
           </div>
           <div className="flex flex-col items-center gap-2 sm:items-start sm:gap-8">
             <p className="text-xl font-600 sm:text-3xl">x1 bulan</p>
             <div className="w-fit rounded-full border border-surface-300 bg-surface-200 px-5 py-1 text-sm sm:text-base">
-              total Rp24.000
+              total <span className="line-through">Rp30.000</span> Rp24.999
             </div>
           </div>
         </div>
@@ -63,13 +63,13 @@ export default function PriceTab({
             />
           </div>
           <div className="flex flex-col items-center gap-3 sm:flex-row">
-            <h2 className="text-4xl font-700 lg:text-5xl">Rp22.000</h2>
+            <h2 className="text-4xl font-700 lg:text-5xl">Rp23.333</h2>
             <p className="shrink-0 text-xl font-700 opacity-70">/ bulan</p>
           </div>
           <div className="flex flex-col items-center gap-2 sm:items-start sm:gap-8">
             <p className="text-xl font-600 sm:text-3xl">x3 bulan</p>
             <div className="w-fit rounded-full border border-surface-400 bg-surface-300 px-5 py-1 text-sm sm:text-base">
-              total <span className="line-through">Rp66.000</span> Rp58.000
+              total <span className="line-through">Rp90.000</span> Rp69.999
             </div>
           </div>
         </div>
@@ -91,13 +91,13 @@ export default function PriceTab({
             />
           </div>
           <div className="flex flex-col items-center gap-3 sm:flex-row">
-            <h2 className="text-4xl font-700 lg:text-5xl">Rp20.000</h2>
+            <h2 className="text-4xl font-700 lg:text-5xl">Rp21.666</h2>
             <p className="shrink-0 text-xl font-700 opacity-70">/ bulan</p>
           </div>
           <div className="flex flex-col items-center gap-2 sm:items-start sm:gap-8">
             <p className="text-xl font-600 sm:text-3xl">x6 bulan</p>
             <div className="w-fit rounded-full border border-surface-400 bg-surface-300 px-5 py-1 text-sm sm:text-base">
-              total <span className="line-through">Rp120.000</span> Rp100.000
+              total <span className="line-through">Rp180.000</span> Rp129.999
             </div>
           </div>
         </div>
