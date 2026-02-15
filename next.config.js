@@ -34,6 +34,20 @@ const nextConfig = {
       },
     ],
   },
+  // Allow unsafe-eval for Midtrans Snap script
+  async headers() {
+    return [
+      {
+        source: "/langganan",
+        headers: [
+          {
+            key: "Content-Security-Policy",
+            value: "script-src 'self' 'unsafe-eval' https://snap-assets.al-pc-id-b.cdn.gtflabs.io https://api.sandbox.midtrans.com https://app.sandbox.midtrans.com https://pay.google.com https://js-agent.newrelic.com https://bam.nr-data.net https://gwk.gopayapi.com; object-src 'none';",
+          },
+        ],
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;
