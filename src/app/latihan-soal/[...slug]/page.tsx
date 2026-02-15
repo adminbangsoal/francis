@@ -11,7 +11,7 @@ export async function generateMetadata({
   const { slug } = params;
   try {
     const subject: GetSubjectBySlugResponse = await (
-      await fetch(`${process.env.API_URL}/api/subjects/slug/` + slug[0])
+      await fetch(`${process.env.API_URL}/api/subjects/slug/` + (slug?.[0] || ""))
     ).json();
 
     const title = `${subject.data.name || "Latihan Soal"} | BangSoal`;

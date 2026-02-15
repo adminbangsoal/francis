@@ -26,14 +26,14 @@ export default function SoalAside({ subject }: SoalAsideProps) {
     if (!subject) {
       router.replace("/latihan-soal/pu");
     }
-  }, [slug[0], subject]);
+  }, [slug?.[0], subject]);
   // if the subject is changing, set the default value of the tab index to be the first question
   useEffect(() => {
-    if (!slug[1] && soalData.length > 0) {
+    if (!slug?.[1] && soalData.length > 0) {
       setDefaultValueTabIndex(0);
       router.replace(`/latihan-soal/${subject.slug}/${soalData[0].id}`);
     }
-  }, [slug[0], soalData, subject, slug[1]]);
+  }, [slug?.[0], soalData, subject, slug?.[1]]);
 
   return isDesktopBreakpoint ? (
     <SoalAsideDesktop subject={subject} />

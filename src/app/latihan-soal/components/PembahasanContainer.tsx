@@ -51,7 +51,7 @@ const PembahasanContainer = ({
 
   const { data: feedbackData, isSuccess } = useGetFeedbackQuery(
     {
-      questionId: slug?.[1],
+      questionId: slug?.[1] || "",
     },
     {
       skip: !slug?.[1],
@@ -96,7 +96,7 @@ const PembahasanContainer = ({
     if (isSuccess && feedbackData) {
       if (feedbackData?.data?.feedback?.is_like == null) {
         await mutateAddFeedback({
-          questionId: slug[1],
+          questionId: slug?.[1] || "",
           isLike,
           feedback: "",
         });
@@ -107,7 +107,7 @@ const PembahasanContainer = ({
           feedback: feedbackData.data.feedback.is_like
             ? ""
             : feedbackData.data.feedback.feedback,
-          questionId: slug[1],
+          questionId: slug?.[1] || "",
         });
       }
     }
@@ -150,7 +150,7 @@ const PembahasanContainer = ({
                     feedbackId: feedbackData.data.feedback.id,
                     isLike: feedbackData.data.feedback.is_like,
                     feedback: form.getValues().feedback,
-                    questionId: slug[1],
+                    questionId: slug?.[1] || "",
                   });
                 }}
                 variant={"bsSecondary"}

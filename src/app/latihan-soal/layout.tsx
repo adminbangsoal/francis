@@ -14,10 +14,10 @@ function LatihanSoalLayout({
   const { slug } = useParams();
   const { data, isSuccess } = useGetSubjectBySlugQuery(
     {
-      slug: slug[0],
+      slug: slug?.[0] || "",
     },
     {
-      skip: !slug[0],
+      skip: !slug?.[0],
     },
   );
 

@@ -34,7 +34,7 @@ export const SekuensialAside = () => {
   }, [timeLimit, data]);
 
   useEffect(() => {
-    if (slug[0] && isSuccess && !timedSoalData) {
+    if (slug?.[0] && isSuccess && !timedSoalData) {
       redirect(`/latihan-soal-timed`);
     }
   }, [slug, isSuccess, data]);

@@ -108,7 +108,7 @@ export const QuestionNavigator = ({
               );
               const slugName = subjectName.toLowerCase().replace(" ", "-");
               router.replace(
-                `/latihan-soal-timed/classic/${slug[0]}/${slugName}/1`,
+                `/latihan-soal-timed/classic/${slug?.[0] || ""}/${slugName}/1`,
               );
             }}
           >

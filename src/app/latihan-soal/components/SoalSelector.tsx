@@ -43,27 +43,27 @@ export default function SoalSelector({
       max_year: `${max_year}`,
       question_id:
         topic_id == "ALL" &&
-        slug[1] &&
-        !soalDataContext.find(({ id }) => id == slug[1])
+        slug?.[1] &&
+        !soalDataContext.find(({ id }) => id == slug?.[1])
           ? undefined
-          : slug[1],
+          : slug?.[1] || undefined,
     },
     {
-      skip: subjectSlug != slug[0] || filtersOpened,
+      skip: subjectSlug != slug?.[0] || filtersOpened,
     },
   );
 
   // force scroll to given question id for desktop view
   useEffect(() => {
-    if (slug[1] && soalData?.data?.questions) {
+    if (slug?.[1] && soalData?.data?.questions) {
       const index = soalData?.data?.questions?.findIndex(
-        ({ id }) => id === slug[1],
+        ({ id }) => id === slug?.[1],
       );
       if (index && index >= 0 && index !== defaultValueTabIndex) {
         setDefaultValueTabIndex(index);
       }
     }
-  }, [slug[1], soalData?.data?.questions]);
+  }, [slug?.[1], soalData?.data?.questions]);
 
   useEffect(() => {
     if (soalDataContext.length <= 0) {

@@ -47,10 +47,10 @@ export const KlasikQuestionContainer = () => {
 
   const { data, isLoading, refetch } = useGetLatihanSoalDetailQuery(
     {
-      id: soalIds[parseInt(slug[2]) - 1],
+      id: soalIds[parseInt(slug?.[2] || "1") - 1] || "",
     },
     {
-      skip: !slug[2] || !soalIds[parseInt(slug[2]) - 1],
+      skip: !slug?.[2] || !soalIds[parseInt(slug?.[2] || "1") - 1],
     },
   );
 
@@ -60,21 +60,21 @@ export const KlasikQuestionContainer = () => {
   const [attemptQuestion] = useAttemptLatihanSoalTimedMutation();
   const { data: attemptData } = useGetLatihanSoalTimedAttemptQuery(
     {
-      timed_question_id: slug[0],
-      question_id: soalIds[parseInt(slug[2]) - 1],
+      timed_question_id: slug?.[0] || "",
+      question_id: soalIds[parseInt(slug?.[2] || "1") - 1] || "",
     },
     {
-      skip: !slug[2] || !soalIds[parseInt(slug[2]) - 1],
+      skip: !slug?.[2] || !soalIds[parseInt(slug?.[2] || "1") - 1],
     },
   );
 
   const { data: pembahasanData } = useGetPembahasanQuery(
     {
-      question_id: soalIds[parseInt(slug[2]) - 1],
+      question_id: soalIds[parseInt(slug?.[2] || "1") - 1] || "",
       attempt_id: attemptData?.data?.id || "",
     },
     {
-      skip: slug.slice(-1)[0] != "feedback" || !attemptData?.data?.id,
+      skip: slug?.slice(-1)[0] != "feedback" || !attemptData?.data?.id,
     },
   );
 
@@ -83,7 +83,7 @@ export const KlasikQuestionContainer = () => {
     answer_history: string,
   ) => {
     await attemptQuestion({
-      timed_question_id: slug[0],
+      timed_question_id: slug?.[0] || "",
       question_id: data?.data.id || "",
       choice_id,
       answer_history,
@@ -108,7 +108,7 @@ export const KlasikQuestionContainer = () => {
     subjectId: string,
   ) => {
     await updateCurrentQuestion({
-      timed_question_id: slug[0],
+      timed_question_id: slug?.[0] || "",
       question_id,
       current_number: idx,
     });
@@ -119,7 +119,7 @@ export const KlasikQuestionContainer = () => {
       const subject = subjects?.find(({ id }) => id == subjectId);
       const subjectSlug = MAPEL_MAPPING[subject?.name as string].slug;
       router.push(
-        `/latihan-soal-timed/classic/${slug[0]}/${subjectSlug}/${idx + 1}`,
+        `/latihan-soal-timed/classic/${slug?.[0] || ""}/${subjectSlug}/${idx + 1}`,
         {
           scroll: false,
         },
@@ -157,7 +157,7 @@ export const KlasikQuestionContainer = () => {
         <div className="px-5">
           <div className="mb-5 flex w-full items-center justify-between rounded-lg bg-[url('/bg-mesh-horizontal.webp')] bg-cover bg-center p-4 text-sm font-700 text-white">
             <div>
-              {selectedSubject?.alternate_name} | No {slug[2]}
+              {selectedSubject?.alternate_name} | No {slug?.[2] || ""}
             </div>
             <div>{endTime && <Timer endTime={endTime} />}</div>
           </div>
@@ -167,7 +167,7 @@ export const KlasikQuestionContainer = () => {
             asChild
             className="sticky left-0 top-10 z-20"
             onClick={() => {
-              getRiwayatTimedLatihanSoal({ id: slug[0] });
+              getRiwayatTimedLatihanSoal({ id: slug?.[0] || "" });
             }}
           >
             <button className="h-10 w-7 rounded-r-full bg-emerald-400 font-700 text-white">
@@ -179,7 +179,7 @@ export const KlasikQuestionContainer = () => {
             className="overflow-auto bg-[url('/bg-mesh-horizontal.webp')] bg-cover bg-center"
           >
             <h4 className="font-700 text-white">
-              {selectedSubject?.alternate_name} | No {slug[2]}
+              {selectedSubject?.alternate_name} | No {slug?.[2] || ""}
             </h4>
             <div className="mt-5">
               {endTime && <Timer endTime={endTime} />}
@@ -276,7 +276,7 @@ export const KlasikQuestionContainer = () => {
             }
             handleAnswerQuestion={handleAttemptQuestion}
             pembahasanData={pembahasanData?.data}
-            timedQuestionId={slug[0]}
+            timedQuestionId={slug?.[0] || ""}
           />
 
           {!!pembahasanData && (
@@ -285,8 +285,8 @@ export const KlasikQuestionContainer = () => {
             </div>
           )}
           <QuestionNavigator
-            hasPrev={parseInt(slug.slice(-1)[0]) > 1}
-            hasNext={parseInt(slug.slice(-1)[0]) < soalIds.length}
+            hasPrev={parseInt(slug?.slice(-1)[0] || "1") > 1}
+            hasNext={parseInt(slug?.slice(-1)[0] || "1") < soalIds.length}
             handleNext={() => {
               handleNavigateQuestion("next");
             }}
@@ -300,7 +300,7 @@ export const KlasikQuestionContainer = () => {
     </div>
   ) : (
     <Modal open={openSummary} setOpen={setOpenSummary} permanent>
-      <HasilLatianCard timedQuestionId={slug[0]} />
+      <HasilLatianCard timedQuestionId={slug?.[0] || ""} />
     </Modal>
   );
 };

@@ -43,12 +43,12 @@ export const KlasikAside = () => {
 
   const { data: currentQuestionData, refetch: refetchCurrentQuestion } =
     useGetLatihanSoalTimedCurrentQuestionQuery({
-      timed_question_id: slug[0],
+      timed_question_id: slug?.[0] || "",
     });
   const { data: currentSoalData, isLoading: currentSoalLoading } =
     useGetLatihanSoalClassicBySubjectQuery(
       {
-        timed_question_id: slug[0],
+        timed_question_id: slug?.[0] || "",
         subject_id: selectedSubject?.id || "",
       },
       {
@@ -60,7 +60,7 @@ export const KlasikAside = () => {
 
   const handleChangeQuestion = async (question_id: string, idx: number) => {
     await updateCurrentQuestion({
-      timed_question_id: slug[0],
+      timed_question_id: slug?.[0] || "",
       question_id,
       current_number: idx,
     });
@@ -72,16 +72,16 @@ export const KlasikAside = () => {
   };
 
   useEffect(() => {
-    if ((!selectedSubject || !slug[1]) && !!timedSoalData) {
+    if ((!selectedSubject || !slug?.[1]) && !!timedSoalData) {
       const currentSubject =
-        subjects.find(({ slug }) => {
-          return slug == slug[1];
+        subjects.find(({ slug: subjectSlug }) => {
+          return subjectSlug == slug?.[1];
         }) || subjects[0];
       if (!!currentSubject) {
         setSelectedSubject(currentSubject);
 
         router.push(
-          `/latihan-soal-timed/classic/${slug[0]}/${currentSubject.slug}/${slug[2] ?? 1}`,
+          `/latihan-soal-timed/classic/${slug?.[0] || ""}/${currentSubject.slug}/${slug?.[2] ?? 1}`,
         );
       }
     }
@@ -111,22 +111,22 @@ export const KlasikAside = () => {
   ]);
 
   useEffect(() => {
-    if (slug[1]) {
+    if (slug?.[1]) {
       const value = slug[1];
-      const currentSubject = subjects.find(({ slug }) => {
-        return slug == value;
+      const currentSubject = subjects.find(({ slug: subjectSlug }) => {
+        return subjectSlug == value;
       });
       if (currentSubject) {
         setSelectedSubject(currentSubject);
       }
     }
-  }, [slug[1]]);
+  }, [slug?.[1]]);
 
   useEffect(() => {
     if (currentSoalData) {
       const questionId = Object.keys(currentSoalData.data)[0];
       updateCurrentQuestion({
-        timed_question_id: slug[0],
+        timed_question_id: slug?.[0] || "",
         question_id: questionId,
         current_number: 0,
       });
@@ -141,11 +141,11 @@ export const KlasikAside = () => {
           <Accordion.Root
             className="flex grow flex-col"
             type="single"
-            defaultValue={`${slug[1]}`}
-            value={`${slug[1]}`}
+            defaultValue={`${slug?.[1] || ""}`}
+            value={`${slug?.[1] || ""}`}
             onValueChange={(value) => {
               router.replace(
-                `/latihan-soal-timed/classic/${slug[0]}/${value}/1`,
+                `/latihan-soal-timed/classic/${slug?.[0] || ""}/${value}/1`,
               );
             }}
           >
@@ -194,7 +194,7 @@ export const KlasikAside = () => {
                     <div className="overflow-hidden">
                       {!currentSoalLoading &&
                       !!currentSoalData?.data &&
-                      slug[0] ? (
+                      slug?.[0] ? (
                         <div className="overflow-hidden">
                           <SoalTracker
                             maxNumber={Object.keys(currentSoalData.data).length}

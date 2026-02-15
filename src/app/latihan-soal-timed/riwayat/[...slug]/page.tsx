@@ -20,8 +20,8 @@ const LatihanSoalTimedRiwayatPage = ({
 
   return (
     <main className="flex">
-      <RiwayatTimedSoalAsideContainer timedQuestionId={slug[0]} />
-      <RiwayatTimedSoalContainer timedQuestionId={slug[0]} />
+      <RiwayatTimedSoalAsideContainer timedQuestionId={slug?.[0] || ""} />
+      <RiwayatTimedSoalContainer timedQuestionId={slug?.[0] || ""} />
     </main>
   );
 };

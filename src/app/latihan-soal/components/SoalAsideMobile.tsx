@@ -39,7 +39,7 @@ const SoalAsideMobile = ({ subject }: SoalAsideProps) => {
 
   const [openFilters, setOpenFilters] = useState<boolean>(false);
 
-  const currentNumber = soalData.findIndex((item) => item.id === slug[1]);
+  const currentNumber = soalData.findIndex((item) => item.id === slug?.[1]);
 
   const next = () => {
     if (currentNumber < soalData.length - 1) {
@@ -71,8 +71,8 @@ const SoalAsideMobile = ({ subject }: SoalAsideProps) => {
       // force update to the first question when the given id is not found
       if (
         soalData.length > 0 &&
-        slug[1] &&
-        !soalData.find(({ id }) => id == slug[1])
+        slug?.[1] &&
+        !soalData.find(({ id }) => id == slug?.[1])
       ) {
         setDefaultValueTabIndex(0);
         router.replace(`/latihan-soal/${subject.slug}/${soalData[0].id}`);

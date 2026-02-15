@@ -48,10 +48,10 @@ export const QuestionContainer = ({ slug }: QuestionContainerI) => {
   const { data: attemptQuestionData, isSuccess: finishedGetAttempt } =
     useGetAttemptLatihanSoalQuery(
       {
-        question_id: slug[1],
+        question_id: slug?.[1] || "",
       },
       {
-        skip: !slug[1],
+        skip: !slug?.[1],
       },
     );
 
@@ -61,7 +61,7 @@ export const QuestionContainer = ({ slug }: QuestionContainerI) => {
     isFetching: pembahasanFetching,
   } = useGetPembahasanQuery(
     {
-      question_id: slug[1],
+      question_id: slug?.[1] || "",
       attempt_id: attemptQuestionData?.data?.id as string,
     },
     {
@@ -71,10 +71,10 @@ export const QuestionContainer = ({ slug }: QuestionContainerI) => {
 
   const { data, isSuccess, isLoading } = useGetLatihanSoalDetailQuery(
     {
-      id: slug[1],
+      id: slug?.[1] || "",
     },
     {
-      skip: !slug[1],
+      skip: !slug?.[1],
     },
   );
   const [question, setQuestion] = useState(data?.data ?? null);
@@ -156,15 +156,15 @@ export const QuestionContainer = ({ slug }: QuestionContainerI) => {
     return (
       <button
         onClick={() => {
-          const subject = slug[0];
+          const subject = slug?.[0] || "";
           // get object key
           downloadPdf({
             subject_id: subjects.filter(
-              (subject) => subject.slug === slug[0],
-            )[0].id,
+              (subject) => subject.slug === slug?.[0],
+            )[0]?.id || "",
             topic_id: selectedTopicId !== "ALL" ? selectedTopicId : undefined,
-            max_year: yearRange[slug[0] as string][1],
-            min_year: yearRange[slug[0] as string][0],
+            max_year: yearRange[slug?.[0] as string]?.[1] || 2024,
+            min_year: yearRange[slug?.[0] as string]?.[0] || 2009,
           });
         }}
         className="group flex items-center gap-1 rounded-full px-2 text-sm font-500 text-surface-400 duration-200 hover:bg-emerald-400 hover:text-emerald-100 md:flex lg:ml-3"

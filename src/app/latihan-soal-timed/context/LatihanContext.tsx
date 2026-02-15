@@ -70,7 +70,7 @@ export const LatihanProvider: FC<Props> = ({ children }) => {
 
   const { isSuccess: isSuccessSummary } = useGetTimedLatihanSoalSummaryQuery(
     {
-      timed_question_id: slug?.[0],
+      timed_question_id: slug?.[0] || "",
     },
     {
       skip: !slug?.[0],
@@ -92,7 +92,7 @@ export const LatihanProvider: FC<Props> = ({ children }) => {
 
   const handleSubmitLatihan = async () => {
     if (isSubmitSuccess) return;
-    await submitLatihan({ timed_question_id: slug[0] || "" });
+    await submitLatihan({ timed_question_id: slug?.[0] || "" });
   };
 
   useEffect(() => {

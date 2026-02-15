@@ -93,12 +93,12 @@ export const LatihanSoalProvider: React.FC<Props> = ({ children }) => {
   }, [subjectData]);
 
   useEffect(() => {
-    if (slug[0] && subjects.length > 0) {
-      const subject = subjects.findIndex((item) => item.slug === slug[0]);
+    if (slug?.[0] && subjects.length > 0) {
+      const subject = subjects.findIndex((item) => item.slug === slug?.[0]);
       setSelectedSubject(subjects[subject]);
       setActiveSubjectIndex(subject);
     }
-  }, [slug[0], subjects.length]);
+  }, [slug?.[0], subjects.length]);
 
   const value = useMemo(
     () => ({

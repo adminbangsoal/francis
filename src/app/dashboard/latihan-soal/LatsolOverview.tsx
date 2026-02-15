@@ -1,10 +1,27 @@
+"use client";
+
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { useGetHeadersDashboardQuery } from "@/redux/api/dashboardApi";
+import { gsap } from "gsap";
 import Image from "next/image";
+import { useEffect, useRef } from "react";
 import { DashboardBoxContainer } from "../elements/DashboardBoxContainer";
 
 export const LatsolOverview = () => {
   const { data } = useGetHeadersDashboardQuery();
+  const floatingImageRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (floatingImageRef.current) {
+      gsap.to(floatingImageRef.current, {
+        y: -8,
+        duration: 2,
+        ease: "power1.inOut",
+        yoyo: true,
+        repeat: -1,
+      });
+    }
+  }, []);
 
   return (
     <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
@@ -36,11 +53,36 @@ export const LatsolOverview = () => {
         <ProgressBar progress={data?.data.accuracy.percentage || 0} />
       </DashboardBoxContainer>
       <DashboardBoxContainer className="col-span-2 md:col-span-1">
-        <p className="flex flex-row items-center gap-3 font-medium">
-          <Image src={"/icons/Fire.svg"} alt="fire" width={28} height={28} />
-          Streak
-        </p>
-        <p className="text-3xl font-bold">{data?.data.streak || 0} Days</p>
+        <div className="flex flex-row items-center justify-between gap-4">
+          <div className="flex flex-col">
+            <p className="flex flex-row items-center gap-3 font-medium">
+              <Image src={"/icons/Fire.svg"} alt="fire" width={28} height={28} />
+              Streak
+            </p>
+            <p className="text-3xl font-bold">{data?.data.streak || 0} Days</p>
+          </div>
+          <div className="relative flex-shrink-0 flex items-center justify-center mr-4 sm:mr-6 md:mr-6">
+            <Image
+              src={"/Book.PNG"}
+              alt="book"
+              width={160}
+              height={160}
+              className="object-contain mt-2 w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 z-0"
+            />
+            <div
+              ref={floatingImageRef}
+              className="absolute mt-2 w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 z-10"
+            >
+              <Image
+                src={"/below10d streak on book.PNG"}
+                alt="streak on book"
+                width={160}
+                height={160}
+                className="object-contain w-full h-full"
+              />
+            </div>
+          </div>
+        </div>
       </DashboardBoxContainer>
     </div>
   );
