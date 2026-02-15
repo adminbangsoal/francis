@@ -7,14 +7,12 @@ export const UNI_LOGOS = [
 export const SIGNUP_COPYWRITING = {
   login: {
     header: "Masuk BangSoal",
-    caption:
-      "Masuk/daftar dengan akun BangSoal kamu untuk segera bisa latihan untuk UTBK!",
-    anchor: "Pelajar baru? Daftar akun baru.",
+    caption: "Masuk dengan Google untuk segera bisa latihan UTBK!",
+    anchor: "", // Not used anymore - manual auth disabled
   },
   register: {
-    header: "Daftar BangSoal",
-    caption:
-      "Buatlah akun BangSoal baru agar bisa latihan untuk UTBK sekarang!",
-    anchor: "Sudah punya akun? Masuk akun.",
+    header: "Masuk BangSoal",
+    caption: "Masuk dengan Google untuk segera bisa latihan UTBK!",
+    anchor: "", // Not used anymore - manual auth disabled
   },
 };
