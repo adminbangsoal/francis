@@ -43,8 +43,12 @@ const DashboardContent = ({ searchParams }: { searchParams: QueryParams }) => {
             <Tabs.Trigger className={cn(tabsTriggerStyle)} value="latihan-soal">
               Latihan Soal
             </Tabs.Trigger>
-            <Tabs.Trigger className={cn(tabsTriggerStyle)} value="catatan">
-              Catatanmu
+            <Tabs.Trigger
+              className={cn(tabsTriggerStyle)}
+              value="catatan"
+              onClick={() => router.push("/coming-soon/war-soal")}
+            >
+              War Soal
             </Tabs.Trigger>
             <Tabs.Trigger
               className={cn(tabsTriggerStyle)}

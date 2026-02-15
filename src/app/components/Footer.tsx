@@ -90,10 +90,10 @@ export default function Footer() {
               Komunitas
               <div className="flex flex-col items-start *:p-0 *:text-surface-400">
                 <Link
-                  href="/bang-catatan"
+                  href="/coming-soon/war-soal"
                   className={cn(buttonVariants({ variant: "link" }), "text-sm")}
                 >
-                  BangCatatan
+                  War Soal
                 </Link>
                 <Link
                   href="/leaderboard"

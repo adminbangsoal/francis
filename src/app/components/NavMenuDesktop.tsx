@@ -52,12 +52,12 @@ export default function NavMenuDesktop() {
               // onClick={() => {
               //   Mixpanel.track("Clicked BangCatatan Page Navbar");
               // }}
-              href="/bang-catatan"
+              href="/coming-soon/war-soal"
               legacyBehavior
               passHref
             >
               <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                BangCatatan
+                War Soal
               </NavigationMenuLink>
             </Link>
           </NavigationMenuItem>

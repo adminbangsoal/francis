@@ -94,10 +94,10 @@ export default function NavMenuMobile() {
             Try out
           </Link>
           <Link
-            href="/bang-catatan"
+            href="/coming-soon/war-soal"
             className={cn(buttonVariants({ variant: "link" }), "text-base")}
           >
-            BangCatatan
+            War Soal
           </Link>
           <Link
             href="/leaderboard"
