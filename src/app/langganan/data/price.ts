@@ -10,20 +10,20 @@ type PackageDetail = {
 const PRICELIST: Record<SubcscriptionType, PackageDetail> = {
   pemula: {
     name: "pemula",
-    price: 24000,
-    total: 24000,
+    price: 24999,
+    total: 24999,
     months: 1,
   },
   setia: {
     name: "setia",
-    price: 22000,
-    total: 58000,
+    price: 23333,
+    total: 69999,
     months: 3,
   },
   ambis: {
     name: "ambis",
-    price: 20000,
-    total: 100000,
+    price: 21666,
+    total: 129999,
     months: 6,
   },
 };
