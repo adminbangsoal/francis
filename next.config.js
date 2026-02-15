@@ -42,7 +42,7 @@ const nextConfig = {
         headers: [
           {
             key: "Content-Security-Policy",
-            value: "script-src 'self' 'unsafe-eval' https://snap-assets.al-pc-id-b.cdn.gtflabs.io https://api.sandbox.midtrans.com https://app.sandbox.midtrans.com https://pay.google.com https://js-agent.newrelic.com https://bam.nr-data.net https://gwk.gopayapi.com https://vercel.live https://*.vercel.live https://*.vercel.app; object-src 'none';",
+            value: "script-src 'self' 'unsafe-eval' https://snap-assets.al-pc-id-b.cdn.gtflabs.io https://api.sandbox.midtrans.com https://app.sandbox.midtrans.com https://pay.google.com https://js-agent.newrelic.com https://bam.nr-data.net https://gwk.gopayapi.com 'sha256-v8V2Y+fbkBMghFEm+ALwcLXqYbjG/N9246T4W4pt1JM='; object-src 'none';",
           },
         ],
       },
