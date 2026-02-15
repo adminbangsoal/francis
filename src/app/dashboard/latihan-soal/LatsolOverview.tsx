@@ -56,29 +56,34 @@ export const LatsolOverview = () => {
         <div className="flex flex-row items-center justify-between gap-4">
           <div className="flex flex-col">
             <p className="flex flex-row items-center gap-3 font-medium">
-              <Image src={"/icons/Fire.svg"} alt="fire" width={28} height={28} />
+              <Image
+                src={"/icons/Fire.svg"}
+                alt="fire"
+                width={28}
+                height={28}
+              />
               Streak
             </p>
             <p className="text-3xl font-bold">{data?.data.streak || 0} Days</p>
           </div>
-          <div className="relative flex-shrink-0 flex items-center justify-center mr-4 sm:mr-6 md:mr-6">
+          <div className="relative mr-4 flex flex-shrink-0 items-center justify-center sm:mr-6 md:mr-6">
             <Image
               src={"/Book.PNG"}
               alt="book"
               width={160}
               height={160}
-              className="object-contain mt-2 w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 z-0"
+              className="z-0 mt-2 h-28 w-28 object-contain sm:h-32 sm:w-32 md:h-36 md:w-36"
             />
             <div
               ref={floatingImageRef}
-              className="absolute mt-2 w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 z-10"
+              className="absolute z-10 mt-2 h-28 w-28 sm:h-32 sm:w-32 md:h-36 md:w-36"
             >
               <Image
                 src={"/below10d streak on book.PNG"}
                 alt="streak on book"
                 width={160}
                 height={160}
-                className="object-contain w-full h-full"
+                className="h-full w-full object-contain"
               />
             </div>
           </div>
