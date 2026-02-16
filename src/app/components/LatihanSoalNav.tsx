@@ -11,7 +11,7 @@ export const LatihanSoalNav = () => {
     <div>
       <ul className="grid w-[400px] gap-3 p-4 sm:grid-cols-1 lg:w-[400px]">
         <div className="col-span-1 px-4">
-          <p>Mode Normal</p>
+          <p>Mode Santai</p>
           <div className="mt-2 h-[1px] w-full bg-neutral-300" />
         </div>
         {subjects ? (

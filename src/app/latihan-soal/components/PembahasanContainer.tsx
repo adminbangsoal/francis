@@ -17,10 +17,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useDropzone } from "react-dropzone";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
-import RenderMarkdown from "./RenderMarkdown";
+import dynamic from "next/dynamic";
+
+const RenderMarkdown = dynamic(() => import("./RenderMarkdown"), {
+  ssr: false,
+  loading: () => (
+    <div className="skeleton relative h-6 w-full rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300 mb-2"></div>
+  ),
+});
 const PembahasanContainer = ({
   data,
   // attemptId,
@@ -34,24 +40,14 @@ const PembahasanContainer = ({
     },
   });
 
-  const { getRootProps, getInputProps, isDragAccept, acceptedFiles } =
-    useDropzone({
-      accept: {
-        "image/jpeg": [".jpeg"],
-        "image/png": [".png"],
-        "image/jpg": [".jpg"],
-      },
-    });
-
   const [pembahasan, setPembahasan] = useState<Pembahasan | string>(
     data.correct_answer,
   );
-  const [acceptedImages, setAcceptedImage] = useState<File[]>([]);
   const { slug } = useParams();
 
   const { data: feedbackData, isSuccess } = useGetFeedbackQuery(
     {
-      questionId: slug?.[1],
+      questionId: slug?.[1] || "",
     },
     {
       skip: !slug?.[1],
@@ -65,22 +61,10 @@ const PembahasanContainer = ({
   const [mutateAddFeedback] = useAddFeedbackMutation();
   const [mutateUpdateFeedback, { isSuccess: isMutateFeedbackSuccess, reset }] =
     useUpdateFeedbackMutation();
-  const [mutateSubmissionAsset] = useAddSubmissionAssetMutation();
 
   const isUserEligable = typeof pembahasan !== "string";
 
   const [isLiked, setIsLiked] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    if (acceptedFiles.length > 0) {
-      // mutateSubmissionAsset({
-      //   attempt_id: attemptId as string,
-      //   file: acceptedFiles[0],
-      // });
-
-      setAcceptedImage([...acceptedImages, ...acceptedFiles]);
-    }
-  }, [acceptedFiles]);
 
   useEffect(() => {
     if (
@@ -96,7 +80,7 @@ const PembahasanContainer = ({
     if (isSuccess && feedbackData) {
       if (feedbackData?.data?.feedback?.is_like == null) {
         await mutateAddFeedback({
-          questionId: slug[1],
+          questionId: slug?.[1] || "",
           isLike,
           feedback: "",
         });
@@ -107,7 +91,7 @@ const PembahasanContainer = ({
           feedback: feedbackData.data.feedback.is_like
             ? ""
             : feedbackData.data.feedback.feedback,
-          questionId: slug[1],
+          questionId: slug?.[1] || "",
         });
       }
     }
@@ -150,7 +134,7 @@ const PembahasanContainer = ({
                     feedbackId: feedbackData.data.feedback.id,
                     isLike: feedbackData.data.feedback.is_like,
                     feedback: form.getValues().feedback,
-                    questionId: slug[1],
+                    questionId: slug?.[1] || "",
                   });
                 }}
                 variant={"bsSecondary"}

@@ -27,7 +27,7 @@ export const RiwayatLatihanContextProvider = ({
   const { data: riwayatAttempt } = useGetLatihanSoalTimedAttemptQuery(
     {
       question_id: currentQuestionId,
-      timed_question_id: slug[0],
+      timed_question_id: slug?.[0] || "",
     },
     {
       skip: !currentQuestionId || !slug?.[0],

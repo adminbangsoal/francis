@@ -1,5 +1,6 @@
 import { ProfileResponse, SigninResponse, SignupResponse, User } from "@/types";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { setCookie } from "cookies-next";
 import storage from "redux-persist/lib/storage";
 import { authApi } from "../api/authApi";
 
@@ -37,72 +38,64 @@ const userSlice = createSlice({
       (state, { payload }: PayloadAction<SigninResponse>) => {
         const token = payload.data.token;
         state.token = token;
-        if (payload.data.user.onboard_date) {
-          state.profile = payload.data.user;
-        }
-      },
-    ),
-      builder.addMatcher(
-        authApi.endpoints.getProfile.matchFulfilled,
-        (state, { payload }: PayloadAction<ProfileResponse>) => {
-          state.profile = { ...payload.data };
-        },
-      ),
-      builder.addMatcher(
-        authApi.endpoints.register.matchFulfilled,
-        (state, { payload }: PayloadAction<SignupResponse>) => {
-          state.token = payload.data;
-        },
-      ),
-      builder.addMatcher(
-        authApi.endpoints.passwordLogin.matchFulfilled,
-        (state, { payload }: PayloadAction<SigninResponse>) => {
-          const token = payload.data.token;
-          state.token = token;
-          if (payload.data.user.onboard_date) {
-            state.profile = payload.data.user;
-          }
+        state.profile = {
+          ...payload.data.user,
+          profile_img: payload.data.user.profile_picture || "",
+        };
+        // Set email cookie for onboarding page
+        setCookie("email", payload.data.user.email, {
+          maxAge: 60 * 60 * 24, // 24 hours
+        });
+        if (!payload.data.user.onboard_date) {
+          window.location.pathname = "/onboarding";
+        } else {
           window.location.pathname = "/dashboard";
-        },
-      );
-    builder.addMatcher(
-      authApi.endpoints.forgotPassword.matchFulfilled,
-      (state, { payload }: PayloadAction<SigninResponse>) => {
-        const token = payload.data.token;
-        state.token = token;
-        if (payload.data.user.onboard_date) {
-          state.profile = payload.data.user;
         }
-        window.location.pathname = "/dashboard";
       },
     );
     builder.addMatcher(
-      authApi.endpoints.verifyMailOtp.matchFulfilled,
+      authApi.endpoints.googleSignIn.matchFulfilled,
       (state, { payload }: PayloadAction<SigninResponse>) => {
         const token = payload.data.token;
         state.token = token;
-        state.profile = payload.data.user;
+        state.profile = {
+          ...payload.data.user,
+          profile_img: payload.data.user.profile_picture || "",
+        };
+        // Set email cookie for onboarding page
+        setCookie("email", payload.data.user.email, {
+          maxAge: 60 * 60 * 24, // 24 hours
+        });
+        if (!payload.data.user.onboard_date) {
+          window.location.pathname = "/onboarding";
+        } else {
+          window.location.pathname = "/dashboard";
+        }
+      },
+    );
+    builder.addMatcher(
+      authApi.endpoints.register.matchFulfilled,
+      (state, { payload }: PayloadAction<SignupResponse>) => {
+        const token = payload.data.token;
+        state.token = token;
+        state.profile = {
+          ...payload.data.user,
+          profile_img: payload.data.user.profile_picture || "",
+        };
+        // Set email cookie for onboarding page
+        setCookie("email", payload.data.user.email, {
+          maxAge: 60 * 60 * 24, // 24 hours
+        });
+        // User baru akan redirect ke onboarding
         window.location.pathname = "/onboarding";
       },
-    ),
-      builder.addMatcher(
-        authApi.endpoints.loginEmail.matchFulfilled,
-        (state, { payload }: PayloadAction<SigninResponse>) => {
-          const token = payload.data.token;
-          state.token = token;
-          state.profile = payload.data.user;
-          window.location.pathname = "/dashboard";
-        },
-      ),
-      builder.addMatcher(
-        authApi.endpoints.verifyForgotPasswordOtp.matchFulfilled,
-        (state, { payload }: PayloadAction<SigninResponse>) => {
-          const token = payload.data.token;
-          state.token = token;
-          state.profile = payload.data.user;
-          window.location.pathname = "/dashboard";
-        },
-      );
+    );
+    builder.addMatcher(
+      authApi.endpoints.getProfile.matchFulfilled,
+      (state, { payload }: PayloadAction<ProfileResponse>) => {
+        state.profile = { ...payload.data };
+      },
+    );
   },
 });
 

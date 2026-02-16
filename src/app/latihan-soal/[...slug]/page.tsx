@@ -6,12 +6,12 @@ import { QuestionContainer } from "../components/QuestionContainer";
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string[] }>;
 }): Promise<Metadata> {
-  const { slug } = params;
+  const { slug } = await params;
   try {
     const subject: GetSubjectBySlugResponse = await (
-      await fetch(`${process.env.API_URL}/api/subjects/slug/` + slug[0])
+      await fetch(`${process.env.API_URL}/api/subjects/slug/` + (slug?.[0] || ""))
     ).json();
 
     const title = `${subject.data.name || "Latihan Soal"} | BangSoal`;
@@ -28,12 +28,13 @@ export async function generateMetadata({
   }
 }
 
-export default function LatihanSoal({
+export default async function LatihanSoal({
   params,
-}: Readonly<{ params: { slug: string[] } }>) {
+}: Readonly<{ params: Promise<{ slug: string[] }> }>) {
+  const { slug } = await params;
   return (
     <main className="md:h-screen md:overflow-y-scroll md:py-10">
-      <QuestionContainer slug={params.slug} />
+      <QuestionContainer slug={slug} />
     </main>
   );
 }

@@ -79,88 +79,91 @@ const ChooseButton = ({
       >
         Pilih
       </Button>
-      <div className="relative my-4 flex h-10 w-full max-w-screen-md items-center justify-center px-10">
-        <div className="h-[1px] w-full max-w-screen-md bg-gray-300"></div>
-        <p className="absolute bg-white px-2 text-sm font-500 text-gray-500">
-          atau
-        </p>
-      </div>
-      <Form {...form}>
-        <form onSubmit={onSubmit}>
-          <div className="w-full max-w-md rounded-lg bg-gray-200 px-4 py-3 md:px-8 md:py-6">
-            <span className="flex items-center">
-              <i className="i-ph-gift-bold h-[20px] w-[20px]" />
-              <p className="pl-2 text-base font-bold">Punya referral?</p>
-            </span>
-            <div className="pt-4 font-600">
-              <p className="text-sm text-gray-600 sm:text-base">
-                Kamu bisa dapatkan potongan layanan BangSoal dengan menggunakan
-                kode referral partner BangSoal!
-              </p>
-            </div>
-            {referralData?.data && referralData?.data.discount != 0 && (
-              <DiscountedPrice
-                firstPrice={PRICELIST[choosenType].total}
-                secondPrice={
-                  PRICELIST[choosenType].total - referralData.data.discount
-                }
-              />
-            )}
-            {!referralData || referralData.data.discount == 0 ? (
-              <div>
-                <div className="mt-5 flex h-[40px] gap-2">
-                  <FormField
-                    control={form.control}
-                    name="referralCode"
-                    render={({ field }) => {
-                      return (
-                        <Input
-                          placeholder="Kode Referral"
-                          className={cn(
-                            isReferralError &&
-                              "h-[40px] !border-2 border-solid !border-rose-700 focus-visible:ring-0 focus-visible:ring-offset-0",
-                          )}
-                          {...field}
-                        />
-                      );
-                    }}
-                  />
-                  <Button
-                    type="submit"
-                    variant="bsPrimary"
-                    className="flex h-[40px] w-[40px] items-center justify-center rounded-full"
-                  >
-                    <i className="i-ph-arrow-right h-[20px] w-[20px]" />
-                  </Button>
-                </div>
-                {referralData &&
-                  referralData.data.discount == 0 &&
-                  !isError &&
-                  !isReferralFetching && (
-                    <div className="mt-4 flex items-center rounded-lg border border-rose-700 bg-rose-100 py-1 pl-3 text-sm text-rose-600">
-                      <i className="i-ph-exclamation-mark mr-2 " />
-                      Kode referral sudah pernah digunakan.
-                    </div>
-                  )}
+      {/* Referral code section - hidden from UI but logic remains intact */}
+      <div className="hidden">
+        <div className="relative my-4 flex h-10 w-full max-w-screen-md items-center justify-center px-10">
+          <div className="h-[1px] w-full max-w-screen-md bg-gray-300"></div>
+          <p className="absolute bg-white px-2 text-sm font-500 text-gray-500">
+            atau
+          </p>
+        </div>
+        <Form {...form}>
+          <form onSubmit={onSubmit}>
+            <div className="w-full max-w-md rounded-lg bg-gray-200 px-4 py-3 md:px-8 md:py-6">
+              <span className="flex items-center">
+                <i className="i-ph-gift-bold h-[20px] w-[20px]" />
+                <p className="pl-2 text-base font-bold">Punya referral?</p>
+              </span>
+              <div className="pt-4 font-600">
+                <p className="text-sm text-gray-600 sm:text-base">
+                  Kamu bisa dapatkan potongan layanan BangSoal dengan menggunakan
+                  kode referral partner BangSoal!
+                </p>
               </div>
-            ) : (
-              <Button
-                variant="bsPrimary"
-                type="button"
-                className="mt-6 w-full"
-                onClick={() => {
-                  createPayment({
-                    subscription_type: choosenType,
-                    referal_code: referralCode,
-                  });
-                }}
-              >
-                Gunakan
-              </Button>
-            )}
-          </div>
-        </form>
-      </Form>
+              {referralData?.data && referralData?.data.discount != 0 && (
+                <DiscountedPrice
+                  firstPrice={PRICELIST[choosenType].total}
+                  secondPrice={
+                    PRICELIST[choosenType].total - referralData.data.discount
+                  }
+                />
+              )}
+              {!referralData || referralData.data.discount == 0 ? (
+                <div>
+                  <div className="mt-5 flex h-[40px] gap-2">
+                    <FormField
+                      control={form.control}
+                      name="referralCode"
+                      render={({ field }) => {
+                        return (
+                          <Input
+                            placeholder="Kode Referral"
+                            className={cn(
+                              isReferralError &&
+                                "h-[40px] !border-2 border-solid !border-rose-700 focus-visible:ring-0 focus-visible:ring-offset-0",
+                            )}
+                            {...field}
+                          />
+                        );
+                      }}
+                    />
+                    <Button
+                      type="submit"
+                      variant="bsPrimary"
+                      className="flex h-[40px] w-[40px] items-center justify-center rounded-full"
+                    >
+                      <i className="i-ph-arrow-right h-[20px] w-[20px]" />
+                    </Button>
+                  </div>
+                  {referralData &&
+                    referralData.data.discount == 0 &&
+                    !isError &&
+                    !isReferralFetching && (
+                      <div className="mt-4 flex items-center rounded-lg border border-rose-700 bg-rose-100 py-1 pl-3 text-sm text-rose-600">
+                        <i className="i-ph-exclamation-mark mr-2 " />
+                        Kode referral sudah pernah digunakan.
+                      </div>
+                    )}
+                </div>
+              ) : (
+                <Button
+                  variant="bsPrimary"
+                  type="button"
+                  className="mt-6 w-full"
+                  onClick={() => {
+                    createPayment({
+                      subscription_type: choosenType,
+                      referal_code: referralCode,
+                    });
+                  }}
+                >
+                  Gunakan
+                </Button>
+              )}
+            </div>
+          </form>
+        </Form>
+      </div>
     </div>
   );
 };

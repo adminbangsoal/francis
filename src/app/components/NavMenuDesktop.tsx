@@ -20,16 +20,13 @@ export default function NavMenuDesktop() {
         <NavigationMenuList>
           <NavigationMenuItem>
             <Link
+              href="/langganan"
+              className={navigationMenuTriggerStyle()}
               // onClick={() => {
               //   Mixpanel.track("Clicked Langganan Page Navbar");
               // }}
-              href="/langganan"
-              legacyBehavior
-              passHref
             >
-              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                Langganan
-              </NavigationMenuLink>
+              Langganan
             </Link>
           </NavigationMenuItem>
           <NavigationMenuItem>
@@ -41,53 +38,44 @@ export default function NavMenuDesktop() {
             </NavigationMenuContent>
           </NavigationMenuItem>
           <NavigationMenuItem>
-            <Link href="/try-out" legacyBehavior passHref>
-              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                Try out
-              </NavigationMenuLink>
+            <Link href="/coming-soon/tryout-akbar" className={navigationMenuTriggerStyle()}>
+              Try out
             </Link>
           </NavigationMenuItem>
           <NavigationMenuItem>
             <Link
+              href="/coming-soon/war-soal"
+              className={navigationMenuTriggerStyle()}
               // onClick={() => {
               //   Mixpanel.track("Clicked BangCatatan Page Navbar");
               // }}
-              href="/bang-catatan"
-              legacyBehavior
-              passHref
             >
-              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                BangCatatan
-              </NavigationMenuLink>
+              War Soal
             </Link>
           </NavigationMenuItem>
 
           <NavigationMenuItem>
             <Link
+              href="/leaderboard"
+              className={navigationMenuTriggerStyle()}
               // onClick={() => {
               //   Mixpanel.track("Clicked Leaderboard Page Navbar");
               // }}
-              href="/leaderboard"
-              legacyBehavior
-              passHref
             >
-              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                Leaderboard
-              </NavigationMenuLink>
+              Leaderboard
             </Link>
           </NavigationMenuItem>
           <NavigationMenuItem>
             <Link
+              href="https://wa.me/6287808417027?text=Haloo%20Bang Admin!"
+              className={navigationMenuTriggerStyle()}
+              target="_blank"
+              rel="noopener noreferrer"
               // onClick={() => {
               //   Mixpanel.track("Clicked hubungi kami navbar");
               // }}
-              href="https://wa.me/6282336666530?text=Haloo%20BangSoal!"
-              legacyBehavior
-              passHref
             >
-              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                Hubungi Kami
-              </NavigationMenuLink>
+              Hubungi Kami
             </Link>
           </NavigationMenuItem>
         </NavigationMenuList>

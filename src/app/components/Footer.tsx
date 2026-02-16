@@ -90,10 +90,10 @@ export default function Footer() {
               Komunitas
               <div className="flex flex-col items-start *:p-0 *:text-surface-400">
                 <Link
-                  href="/bang-catatan"
+                  href="/coming-soon/war-soal"
                   className={cn(buttonVariants({ variant: "link" }), "text-sm")}
                 >
-                  BangCatatan
+                  War Soal
                 </Link>
                 <Link
                   href="/leaderboard"
@@ -102,7 +102,7 @@ export default function Footer() {
                   Leaderboard
                 </Link>
                 <Link
-                  href="https://wa.me/6282336666530?text=Haloo%20BangSoal!"
+                  href="https://wa.me/6287808417027?text=Haloo%20Bang Admin!"
                   className={cn(buttonVariants({ variant: "link" }), "text-sm")}
                 >
                   Hubungi Kami

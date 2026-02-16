@@ -78,7 +78,7 @@ export const SoalTracker = ({
     >
       {[...Array(maxNumber)].map((_, idx) => {
         const soalNum =
-          (currentNumber ?? parseInt(slug.slice(-1)[0] || "0")) - 1;
+          (currentNumber ?? parseInt(slug?.slice(-1)[0] || "0")) - 1;
 
         const isActive =
           currentNumber !== undefined

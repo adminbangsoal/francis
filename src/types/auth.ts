@@ -10,41 +10,47 @@ export type SigninResponse = ResponseWrapper<{
     highschool_year: string;
     choosen_university_one: string;
     choosen_major_one: string;
+    choosen_university_two?: string;
+    choosen_major_two?: string;
+    choosen_university_three?: string;
+    choosen_major_three?: string;
     phone_number: string;
     onboard_date: string;
-    profile_img: string;
+    profile_picture: string;
   };
 }>;
-export type SignupResponse = ResponseWrapper<string>;
+export type SignupResponse = SigninResponse;
 
+export type RegisterRequest = {
+  email: string;
+  password: string;
+};
+
+export type LoginRequest = {
+  email: string;
+  password: string;
+};
+
+export type GoogleSignInRequest = {
+  idToken: string;
+};
+
+export type ForgotPasswordRequest = {
+  email: string;
+};
+
+export type ResetPasswordRequest = {
+  token: string;
+  password: string;
+};
+
+// Legacy types - kept for backward compatibility during migration
 export type SigninRequest = {
-  phone_number: string;
-  otp: string;
+  email: string;
+  password: string;
 };
 
 export type SigninEmailRequest = {
   email: string;
   password: string;
 };
-
-export type SendOTPRequest = {
-  phone_number: string;
-};
-
-export type PasswordSignInRequest = {
-  phone_number: string;
-  password: string;
-};
-
-export type OnboardPassword = {
-  password: string;
-  phone_number: string;
-};
-
-export type SendMailOtpRequest = {
-  email: string;
-};
-
-export interface VerifyMailOtpRequest extends SendMailOtpRequest {
-  otp: string;
-}

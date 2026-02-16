@@ -113,13 +113,13 @@ export default function Quiz({ topic }: Readonly<{ topic: string }>) {
         <div className="flex grow flex-col gap-2">
           <h3 className="text-2xl font-600 text-content-100">{data.title}</h3>
           <div ref={ref} className="flex flex-col gap-2">
-            {data.question.split("\n").map((line) => (
-              <p
-                key={line}
+            {data.question.split("\n").map((line, index) => (
+              <div
+                key={`${line}-${index}`}
                 className="select-none font-500 leading-snug text-content-300"
               >
                 {handleKatex(line)}
-              </p>
+              </div>
             ))}
           </div>
         </div>
@@ -193,7 +193,7 @@ export default function Quiz({ topic }: Readonly<{ topic: string }>) {
             <div className="flex w-8 shrink-0 items-center justify-center self-stretch rounded-sm bg-surface-200 font-700 uppercase text-content-100 group-data-[state=on]:group-data-[answer=false]:bg-rose-300 group-data-[state=on]:group-data-[answer=true]:bg-emerald-300 group-data-[state=on]:group-data-[answer=false]:text-rose-900 group-data-[state=on]:group-data-[answer=true]:text-emerald-900">
               {choice.id}
             </div>
-            <p className="py-2">{handleKatex(choice.text)}</p>
+            <div className="py-2">{handleKatex(choice.text)}</div>
           </ToggleGroupItem>
         ))}
       </ToggleGroup>

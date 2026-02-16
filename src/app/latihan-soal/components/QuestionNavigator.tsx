@@ -27,7 +27,7 @@ const QuestionNavigator = ({
   const [attemptSoal, { isSuccess, data: attemptData }] =
     useAttemptLatihanSoalMutation();
 
-  const currentNumber = soalData.findIndex((item) => item.id === slug[1]);
+  const currentNumber = soalData.findIndex((item) => item.id === slug?.[1]);
   const isLastNumber = currentNumber === soalData.length - 1;
   const isFirstNumber = currentNumber === 0;
 
@@ -35,20 +35,20 @@ const QuestionNavigator = ({
     if (isSuccess && attemptData && questionType === "fill-in") {
       submitMutation({
         attempt_id: attemptData.data.id,
-        question_id: slug[1],
+        question_id: slug?.[1] || "",
       });
     }
   }, [isSuccess, attemptData]);
 
   const next = () => {
     router.replace(
-      `/latihan-soal/${slug[0]}/${soalData[currentNumber + 1].id}`,
+      `/latihan-soal/${slug?.[0] || ""}/${soalData[currentNumber + 1].id}`,
     );
   };
 
   const prev = () => {
     router.replace(
-      `/latihan-soal/${slug[0]}/${soalData[currentNumber - 1].id}`,
+      `/latihan-soal/${slug?.[0] || ""}/${soalData[currentNumber - 1].id}`,
     );
   };
 
@@ -95,7 +95,7 @@ const QuestionNavigator = ({
             ) {
               submitMutation({
                 attempt_id: data?.data.id,
-                question_id: slug[1],
+                question_id: slug?.[1] || "",
               });
             } else if (questionType == "fill-in") {
               const input = document.querySelectorAll(
@@ -106,7 +106,7 @@ const QuestionNavigator = ({
                 answer_history: answers.join(","),
                 answers: answers,
                 choice_id: undefined,
-                question_id: slug[1],
+                question_id: slug?.[1] || "",
               });
             }
           }

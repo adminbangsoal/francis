@@ -29,7 +29,7 @@ const TimedQuestionContainer = () => {
   const { data: riwayatTimedLatihanSoal } =
     useGetAllAttemptedCurrentQuestionsQuery(
       {
-        id: slug[0],
+        id: slug?.[0] || "",
       },
       {
         skip: !slug?.[0],
@@ -40,11 +40,11 @@ const TimedQuestionContainer = () => {
 
   const { data: pembahasanData } = useGetPembahasanQuery(
     {
-      question_id: slug[1],
+      question_id: slug?.[1] || "",
       attempt_id: data?.data?.attempt?.id || "",
     },
     {
-      skip: slug.slice(-1)[0] !== "feedback" || !data?.data?.attempt?.id,
+      skip: slug?.slice(-1)[0] !== "feedback" || !data?.data?.attempt?.id,
     },
   );
 

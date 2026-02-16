@@ -18,8 +18,8 @@ const choices = [
   },
   {
     id: "d",
-    text: "BangCatatan",
-    link: "/bang-catatan",
+    text: "War Soal",
+    link: "/coming-soon/war-soal",
   },
 ];
 

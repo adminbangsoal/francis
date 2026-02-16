@@ -23,7 +23,7 @@ const SoalSelector = ({ subjectId, topicId }: ISoalSelector): JSX.Element => {
   const [currentNumber, setCurrentNumber] = useState<number>(0);
   const [tiles, setTiles] = useState<{ id: string; content: string }[]>([]);
 
-  const { data } = useGetLatihanSoalHistoryQuery({
+  const { data, isLoading } = useGetLatihanSoalHistoryQuery({
     subject_id: subjectId,
     topic_id: topicId === "ALL" ? undefined : topicId,
   });
@@ -71,6 +71,14 @@ const SoalSelector = ({ subjectId, topicId }: ISoalSelector): JSX.Element => {
     );
   };
 
+  const renderSkeletonTile = ({ index, key, style }: any) => {
+    return (
+      <div key={key} style={style} className="flex flex-col items-center">
+        <div className="skeleton relative !h-[4.25rem] w-full rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
+      </div>
+    );
+  };
+
   return (
     <>
       <Tabs.Root
@@ -79,8 +87,20 @@ const SoalSelector = ({ subjectId, topicId }: ISoalSelector): JSX.Element => {
         className="grow"
       >
         <Tabs.List className="flex h-full w-full flex-col gap-1">
-          <Suspense fallback={<SoalCardSkeleton />}>
-            {tiles && (
+          {isLoading ? (
+            <AutoSizer>
+              {({ height, width }) => (
+                <List
+                  height={height}
+                  width={width}
+                  rowCount={6}
+                  rowHeight={70}
+                  rowRenderer={renderSkeletonTile}
+                />
+              )}
+            </AutoSizer>
+          ) : tiles && tiles.length > 0 ? (
+            <Suspense fallback={<SoalCardSkeleton />}>
               <AutoSizer>
                 {({ height, width }) => (
                   <List
@@ -93,8 +113,8 @@ const SoalSelector = ({ subjectId, topicId }: ISoalSelector): JSX.Element => {
                   />
                 )}
               </AutoSizer>
-            )}
-          </Suspense>
+            </Suspense>
+          ) : null}
         </Tabs.List>
       </Tabs.Root>
 

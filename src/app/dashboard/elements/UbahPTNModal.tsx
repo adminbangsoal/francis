@@ -52,12 +52,6 @@ export const UbahPTNModal = ({ open, setOpen }: ModalI) => {
   const majorOne = watch("choosen_major_one");
   const majorTwo = watch("choosen_major_two");
 
-  const ptnValues = getValues([
-    "choosen_university_one",
-    "choosen_university_two",
-    "choosen_university_three",
-  ]);
-
   const [selectedPTN, setSelectedPTN] = useState<PTNChoices>({
     one: null,
     two: null,
@@ -75,24 +69,35 @@ export const UbahPTNModal = ({ open, setOpen }: ModalI) => {
 
   const [step, setStep] = useState<number>(getDefaultStep());
 
+  // Update selectedPTN when university values change
   useEffect(() => {
-    if (ptnList) {
+    if (ptnList && ptnList.length > 0) {
       setSelectedPTN({
-        one: ptnList.find(({ name }) => name == ptnValues[0]) ?? null,
-        two: ptnList.find(({ name }) => name == ptnValues[1]) ?? null,
-        three: ptnList.find(({ name }) => name == ptnValues[2]) ?? null,
+        one: uniOne ? ptnList.find(({ name }) => name === uniOne) ?? null : null,
+        two: uniTwo ? ptnList.find(({ name }) => name === uniTwo) ?? null : null,
+        three: uniThree ? ptnList.find(({ name }) => name === uniThree) ?? null : null,
       });
     }
+  }, [uniOne, uniTwo, uniThree, ptnList]);
+
+  // Clear major fields when university is cleared
+  useEffect(() => {
     if (!uniOne || !majorOne) {
       setValue("choosen_major_one", "");
     }
+  }, [uniOne, majorOne, setValue]);
+
+  useEffect(() => {
     if (!uniTwo || !majorTwo) {
       setValue("choosen_major_two", "");
     }
+  }, [uniTwo, majorTwo, setValue]);
+
+  useEffect(() => {
     if (!uniThree) {
       setValue("choosen_major_three", "");
     }
-  }, [uniOne, uniTwo, uniThree, majorOne, majorTwo, ptnList]);
+  }, [uniThree, setValue]);
 
   useEffect(() => {
     if (isSuccess && updatedUser) {
@@ -172,7 +177,7 @@ export const UbahPTNModal = ({ open, setOpen }: ModalI) => {
                           defaultValue={defaultValues?.choosen_major_one}
                           placeholder="Pilih Prodi"
                           error={fieldState.error}
-                          disabled={!ptnValues[0]}
+                          disabled={!uniOne}
                         />
                       </>
 
@@ -183,7 +188,7 @@ export const UbahPTNModal = ({ open, setOpen }: ModalI) => {
               />
             </div>
 
-            {(step >= 2 || (majorOne && ptnValues[1])) && (
+            {(step >= 2 || (majorOne && uniTwo)) && (
               <div className="flex flex-col gap-2">
                 <div className="flex flex-row items-center gap-1 lg:gap-2">
                   <p className="text-gray-400">Pilihan Kedua</p>
@@ -260,7 +265,7 @@ export const UbahPTNModal = ({ open, setOpen }: ModalI) => {
               </div>
             )}
 
-            {(step >= 3 || (majorTwo && ptnValues[2])) && (
+            {(step >= 3 || (majorTwo && uniThree)) && (
               <div className="flex flex-col gap-2">
                 <div className="flex flex-row items-center gap-1 lg:gap-2">
                   <p className="text-gray-400">Pilihan Ketiga</p>

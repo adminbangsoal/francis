@@ -6,26 +6,11 @@ import { RootState, useAppSelector } from "@/redux/store";
 import { Button } from "@/components/ui/button";
 
 // libs
-import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-
-import { SigninFormSchema } from "@/types/schema/auth";
 import { useRouter } from "next/navigation";
 
 export default function SignUp() {
   const router = useRouter();
-  const form = useForm<z.infer<typeof SigninFormSchema>>({
-    resolver: zodResolver(SigninFormSchema),
-    defaultValues: {
-      phone_number: "",
-    },
-  });
-
-  function onSubmit(values: z.infer<typeof SigninFormSchema>) {
-    router.push(`/signup?number=${values.phone_number}`);
-  }
   const user = useAppSelector((state: RootState) => state.user);
 
   if (!!user.profile) {

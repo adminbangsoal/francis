@@ -1,9 +1,16 @@
 "use client";
 import { Content } from "@/types";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
-import RenderMarkdown from "./RenderMarkdown";
+
+const RenderMarkdown = dynamic(() => import("./RenderMarkdown"), {
+  ssr: false,
+  loading: () => (
+    <div className="skeleton relative h-6 w-full rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
+  ),
+});
 
 interface QuestionFillInProps {
   content: Content[];

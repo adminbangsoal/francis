@@ -16,10 +16,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useLatihanSoalContext } from "../context";
-import PembahasanContainer from "./PembahasanContainer";
 import QuestionNavigator from "./QuestionNavigator";
-import QuestionTable from "./QuestionTable";
-import RenderMarkdown from "./RenderMarkdown";
 import { OptionBoxVariants, correctChoice, wrongChoice } from "./style";
 
 const QuestionFillIn = dynamic(() => import("./QuestionFillIn"), {
@@ -29,6 +26,34 @@ const QuestionFillIn = dynamic(() => import("./QuestionFillIn"), {
       <div className="skeleton relative mt-2 h-9 w-full rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
       <div className="skeleton relative mt-2 h-9 w-full rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
       <div className="skeleton relative mt-2 h-9 w-full rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
+    </div>
+  ),
+});
+
+const RenderMarkdown = dynamic(() => import("./RenderMarkdown"), {
+  ssr: false,
+  loading: () => (
+    <div className="skeleton relative h-6 w-full rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
+  ),
+});
+
+const PembahasanContainer = dynamic(() => import("./PembahasanContainer"), {
+  ssr: false,
+  loading: () => (
+    <div className="relative mb-10 rounded-xl border-2 border-gray-200 px-6 pb-10 pt-4">
+      <div className="skeleton relative h-4 w-24 rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300 mb-4"></div>
+      <div className="skeleton relative h-32 w-full rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
+    </div>
+  ),
+});
+
+const QuestionTable = dynamic(() => import("./QuestionTable"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex flex-col gap-y-3">
+      <div className="skeleton relative h-9 w-full rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
+      <div className="skeleton relative h-9 w-full rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
+      <div className="skeleton relative h-9 w-full rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
     </div>
   ),
 });
@@ -48,10 +73,10 @@ export const QuestionContainer = ({ slug }: QuestionContainerI) => {
   const { data: attemptQuestionData, isSuccess: finishedGetAttempt } =
     useGetAttemptLatihanSoalQuery(
       {
-        question_id: slug[1],
+        question_id: slug?.[1] || "",
       },
       {
-        skip: !slug[1],
+        skip: !slug?.[1],
       },
     );
 
@@ -61,7 +86,7 @@ export const QuestionContainer = ({ slug }: QuestionContainerI) => {
     isFetching: pembahasanFetching,
   } = useGetPembahasanQuery(
     {
-      question_id: slug[1],
+      question_id: slug?.[1] || "",
       attempt_id: attemptQuestionData?.data?.id as string,
     },
     {
@@ -71,10 +96,10 @@ export const QuestionContainer = ({ slug }: QuestionContainerI) => {
 
   const { data, isSuccess, isLoading } = useGetLatihanSoalDetailQuery(
     {
-      id: slug[1],
+      id: slug?.[1] || "",
     },
     {
-      skip: !slug[1],
+      skip: !slug?.[1],
     },
   );
   const [question, setQuestion] = useState(data?.data ?? null);
@@ -156,15 +181,15 @@ export const QuestionContainer = ({ slug }: QuestionContainerI) => {
     return (
       <button
         onClick={() => {
-          const subject = slug[0];
+          const subject = slug?.[0] || "";
           // get object key
           downloadPdf({
             subject_id: subjects.filter(
-              (subject) => subject.slug === slug[0],
-            )[0].id,
+              (subject) => subject.slug === slug?.[0],
+            )[0]?.id || "",
             topic_id: selectedTopicId !== "ALL" ? selectedTopicId : undefined,
-            max_year: yearRange[slug[0] as string][1],
-            min_year: yearRange[slug[0] as string][0],
+            max_year: yearRange[slug?.[0] as string]?.[1] || 2024,
+            min_year: yearRange[slug?.[0] as string]?.[0] || 2009,
           });
         }}
         className="group flex items-center gap-1 rounded-full px-2 text-sm font-500 text-surface-400 duration-200 hover:bg-emerald-400 hover:text-emerald-100 md:flex lg:ml-3"
