@@ -45,9 +45,12 @@ const userSlice = createSlice({
         // Set email cookie for onboarding page
         setCookie("email", payload.data.user.email, {
           maxAge: 60 * 60 * 24, // 24 hours
+          path: "/", // Ensure cookie is accessible across all routes
+          sameSite: "lax", // Security setting
         });
         if (!payload.data.user.onboard_date) {
-          window.location.pathname = "/onboarding";
+          // Use href with query param as fallback to ensure email is available
+          window.location.href = `/onboarding?email=${encodeURIComponent(payload.data.user.email)}`;
         } else {
           window.location.pathname = "/dashboard";
         }
@@ -65,9 +68,12 @@ const userSlice = createSlice({
         // Set email cookie for onboarding page
         setCookie("email", payload.data.user.email, {
           maxAge: 60 * 60 * 24, // 24 hours
+          path: "/", // Ensure cookie is accessible across all routes
+          sameSite: "lax", // Security setting
         });
         if (!payload.data.user.onboard_date) {
-          window.location.pathname = "/onboarding";
+          // Use href with query param as fallback to ensure email is available
+          window.location.href = `/onboarding?email=${encodeURIComponent(payload.data.user.email)}`;
         } else {
           window.location.pathname = "/dashboard";
         }
@@ -85,9 +91,12 @@ const userSlice = createSlice({
         // Set email cookie for onboarding page
         setCookie("email", payload.data.user.email, {
           maxAge: 60 * 60 * 24, // 24 hours
+          path: "/", // Ensure cookie is accessible across all routes
+          sameSite: "lax", // Security setting
         });
         // User baru akan redirect ke onboarding
-        window.location.pathname = "/onboarding";
+        // Use href with query param as fallback to ensure email is available
+        window.location.href = `/onboarding?email=${encodeURIComponent(payload.data.user.email)}`;
       },
     );
     builder.addMatcher(
