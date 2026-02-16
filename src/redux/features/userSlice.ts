@@ -48,11 +48,18 @@ const userSlice = createSlice({
           path: "/", // Ensure cookie is accessible across all routes
           sameSite: "lax", // Security setting
         });
-        if (!payload.data.user.onboard_date) {
-          // Use href with query param as fallback to ensure email is available
-          window.location.href = `/onboarding?email=${encodeURIComponent(payload.data.user.email)}`;
-        } else {
-          window.location.pathname = "/dashboard";
+        // Ensure token is saved to localStorage before redirect
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem("token", token);
+          // Wait a bit for redux-persist to save state and cookie to be set
+          setTimeout(() => {
+            if (!payload.data.user.onboard_date) {
+              // Use href with query param as fallback to ensure email is available
+              window.location.href = `/onboarding?email=${encodeURIComponent(payload.data.user.email)}`;
+            } else {
+              window.location.pathname = "/dashboard";
+            }
+          }, 300);
         }
       },
     );
@@ -71,11 +78,18 @@ const userSlice = createSlice({
           path: "/", // Ensure cookie is accessible across all routes
           sameSite: "lax", // Security setting
         });
-        if (!payload.data.user.onboard_date) {
-          // Use href with query param as fallback to ensure email is available
-          window.location.href = `/onboarding?email=${encodeURIComponent(payload.data.user.email)}`;
-        } else {
-          window.location.pathname = "/dashboard";
+        // Ensure token is saved to localStorage before redirect
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem("token", token);
+          // Wait a bit for redux-persist to save state and cookie to be set
+          setTimeout(() => {
+            if (!payload.data.user.onboard_date) {
+              // Use href with query param as fallback to ensure email is available
+              window.location.href = `/onboarding?email=${encodeURIComponent(payload.data.user.email)}`;
+            } else {
+              window.location.pathname = "/dashboard";
+            }
+          }, 300);
         }
       },
     );
@@ -94,9 +108,16 @@ const userSlice = createSlice({
           path: "/", // Ensure cookie is accessible across all routes
           sameSite: "lax", // Security setting
         });
-        // User baru akan redirect ke onboarding
-        // Use href with query param as fallback to ensure email is available
-        window.location.href = `/onboarding?email=${encodeURIComponent(payload.data.user.email)}`;
+        // Ensure token is saved to localStorage before redirect
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem("token", token);
+          // Wait a bit for redux-persist to save state
+          setTimeout(() => {
+            // User baru akan redirect ke onboarding
+            // Use href with query param as fallback to ensure email is available
+            window.location.href = `/onboarding?email=${encodeURIComponent(payload.data.user.email)}`;
+          }, 100);
+        }
       },
     );
     builder.addMatcher(
