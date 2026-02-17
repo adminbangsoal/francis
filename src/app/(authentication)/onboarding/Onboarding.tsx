@@ -8,7 +8,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { getCookie } from "cookies-next";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -199,7 +198,7 @@ const Onboarding = () => {
                             disabled
                             placeholder="bangsoal@gmail.com"
                             {...field}
-                            value={getCookie("email")}
+                            value={user.profile?.email || ""}
                           />
                         </>
 
