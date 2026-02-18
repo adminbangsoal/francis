@@ -8,6 +8,18 @@ import { useRiwayatLatihanSoalContext } from "../context";
 import Filters from "./Filters";
 import SoalSelector from "./SoalSelector";
 
+const SubjectSkeleton = () => {
+  return (
+    <div className="group relative flex flex-col rounded-xl bg-cover data-[state=closed]:h-11">
+      <div className="group z-10 flex w-full items-center gap-2 rounded-xl px-3 py-2">
+        <div className="skeleton relative h-5 w-5 rounded bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
+        <div className="skeleton relative h-5 w-32 rounded bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
+        <div className="skeleton relative h-5 w-5 rounded bg-surface-300 from-surface-300 via-surface-100 to-surface-300 ml-auto"></div>
+      </div>
+    </div>
+  );
+};
+
 const RiwayatSoalAsideDesktop = () => {
   const {
     currentTopic,
@@ -17,6 +29,7 @@ const RiwayatSoalAsideDesktop = () => {
     setCurrentTopic,
     setYearRange,
     setSelectedSubject,
+    isLoadingSubjects,
   } = useRiwayatLatihanSoalContext();
 
   return (
@@ -30,7 +43,13 @@ const RiwayatSoalAsideDesktop = () => {
           <p className="!mb-0 font-[550]">Latihan Soal</p>
         </div>
         <div className="flex grow flex-col gap-5 px-5 pb-5 text-content-300">
-          {selectedSubject && (
+          {isLoadingSubjects ? (
+            <div className="flex grow flex-col gap-2">
+              {[...Array(6)].map((_, idx) => (
+                <SubjectSkeleton key={idx} />
+              ))}
+            </div>
+          ) : selectedSubject ? (
             <Accordion.Root
               className="flex grow flex-col"
               type="single"
@@ -89,7 +108,7 @@ const RiwayatSoalAsideDesktop = () => {
                 );
               })}
             </Accordion.Root>
-          )}
+          ) : null}
         </div>
       </aside>
     </MediaQuery>

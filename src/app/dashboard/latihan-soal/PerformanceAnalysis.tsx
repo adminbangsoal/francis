@@ -75,36 +75,54 @@ export const PerformanceAnalysis = () => {
   }
 
   // Calculate analysis data
+  // Note: total_question from backend is total questions available, not total attempts
+  // We only have 'correct' count, so we need to calculate based on attempted topics
   const subjectAnalyses: SubjectAnalysis[] = data.data.map((subjectData) => {
     // Calculate total attempted and correct for this subject
+    // We count topics that have been attempted (correct > 0) and sum their correct answers
     let totalAttempted = 0;
     let totalCorrect = 0;
     const weakTopics: SubjectAnalysis["weakTopics"] = [];
 
     subjectData.topics.forEach((topic) => {
-      totalAttempted += topic.total_question;
-      totalCorrect += topic.correct;
-      
-      // Calculate accuracy for each topic
-      const topicAccuracy =
-        topic.total_question > 0
-          ? (topic.correct / topic.total_question) * 100
-          : 0;
+      // Only count topics that have been attempted (correct > 0)
+      // Since we don't have total attempt count, we use correct as indicator
+      if (topic.correct > 0) {
+        // For accuracy calculation, we need to estimate based on correct count
+        // Since we don't have total attempt, we'll use a different approach:
+        // Show topics with low correct count relative to available questions
+        // or topics where correct count is low (indicating poor performance)
+        
+        // Calculate a performance score: correct / total_question (as percentage of available)
+        // This gives us an idea of mastery level
+        const performanceScore =
+          topic.total_question > 0
+            ? (topic.correct / topic.total_question) * 100
+            : 0;
 
-      // Only include topics with attempts and accuracy < 70%
-      if (topic.total_question > 0 && topicAccuracy < 70) {
-        weakTopics.push({
-          topic: topic.topic,
-          accuracy: topicAccuracy,
-          correct: topic.correct,
-          total: topic.total_question,
-        });
+        // Consider a topic "weak" if performance score < 70% of available questions
+        // This means user has attempted but hasn't mastered the topic
+        if (performanceScore < 70) {
+          weakTopics.push({
+            topic: topic.topic,
+            accuracy: performanceScore, // This is mastery level, not true accuracy
+            correct: topic.correct,
+            total: topic.total_question, // Total available, not total attempted
+          });
+        }
+
+        // For subject-level calculation, we sum up correct answers
+        // Note: This is not true accuracy since we don't have total attempt
+        totalAttempted += topic.total_question; // Using available as proxy
+        totalCorrect += topic.correct;
       }
     });
 
     // Sort weak topics by accuracy (lowest first)
     weakTopics.sort((a, b) => a.accuracy - b.accuracy);
 
+    // Calculate subject-level performance
+    // This is an approximation since we don't have total attempt count
     const accuracy =
       totalAttempted > 0 ? (totalCorrect / totalAttempted) * 100 : 0;
 
