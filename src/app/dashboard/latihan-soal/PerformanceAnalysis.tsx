@@ -16,6 +16,7 @@ interface SubjectAnalysis {
   correctAnswers: number;
   weakTopics: {
     topic: string;
+    topicId: string;
     accuracy: number;
     correct: number;
     total: number;
@@ -95,6 +96,7 @@ export const PerformanceAnalysis = () => {
         if (topicAccuracy < 70) {
           weakTopics.push({
             topic: topic.topic,
+            topicId: topic.topic_id,
             accuracy: topicAccuracy,
             correct: topic.correct,
             total: topic.total_attempt, // Use total_attempt, not total_question
@@ -150,6 +152,7 @@ export const PerformanceAnalysis = () => {
         
         return {
           ...topic,
+          topicId: topic.topicId,
           subjectName: subject.subject,
           subjectSlug: subject.slug,
           subjectIcon: subject.icon,
@@ -284,13 +287,23 @@ export const PerformanceAnalysis = () => {
                 </p>
                 <div className="flex flex-col gap-2">
                   {allWeakTopics.map((topic, idx) => (
-                    <div
+                    <Link
                       key={idx}
-                      className="flex flex-row items-center justify-between rounded-lg bg-white border border-slate-200 px-4 py-3"
+                      href={`/latihan-soal/${topic.subjectSlug}`}
+                      onClick={() => {
+                        // Store topic_id in sessionStorage to be picked up by latihan-soal context
+                        if (typeof window !== "undefined") {
+                          sessionStorage.setItem(
+                            `latihan-soal-topic-${topic.subjectSlug}`,
+                            topic.topicId,
+                          );
+                        }
+                      }}
+                      className="group flex flex-row items-center justify-between rounded-lg bg-white border border-slate-200 px-4 py-3 transition-all hover:shadow-md hover:border-slate-300"
                     >
                       <div className="flex flex-row items-center gap-3 flex-1 min-w-0">
                         <div className="flex flex-col min-w-0 flex-1">
-                          <p className="font-medium text-sm text-gray-900 truncate">
+                          <p className="font-medium text-sm text-gray-900 truncate group-hover:text-slate-700">
                             {topic.topic}
                           </p>
                           <p className="text-xs text-gray-500">
@@ -319,7 +332,7 @@ export const PerformanceAnalysis = () => {
                           </div>
                         </div>
                       </div>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               </AccordionContent>
