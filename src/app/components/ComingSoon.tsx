@@ -13,12 +13,14 @@ import {
 // libs
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { AVAILABLE_PATHS } from "./path";
+import Iconify from "@/components/Iconify";
 
 export default function ComingSoon() {
   const pathname = usePathname();
+  const router = useRouter();
 
   const isAvailablePath = AVAILABLE_PATHS.some((path) => {
     return pathname === path;
@@ -36,9 +38,18 @@ export default function ComingSoon() {
   }
 
   return (
-    <ContextMenu>
-      <ContextMenuTrigger className="fixed inset-0 z-50 flex h-screen flex-col items-center justify-center bg-surface-100/70 px-5 backdrop-blur-2xl sm:px-10">
-        <Image
+    <>
+      <button
+        onClick={() => router.back()}
+        className="fixed left-5 top-5 z-[100] flex items-center gap-2 rounded-full bg-white/95 px-4 py-2.5 text-sm font-600 text-content-200 shadow-xl backdrop-blur-sm transition-all hover:bg-white hover:scale-105 border border-surface-300/50 sm:left-10 sm:top-10"
+        aria-label="Kembali"
+      >
+        <Iconify icon="ph:arrow-left-bold" className="text-lg" />
+        <span className="hidden sm:inline">Kembali</span>
+      </button>
+      <ContextMenu>
+        <ContextMenuTrigger className="fixed inset-0 z-50 flex h-screen flex-col items-center justify-center bg-surface-100/70 px-5 backdrop-blur-2xl sm:px-10">
+          <Image
           src="/illustrations/empty-state-under-construction.svg"
           alt="Under Construction"
           width={400}
@@ -97,5 +108,6 @@ export default function ComingSoon() {
         <Image src={rickroll} alt="Context menu" />
       </ContextMenuContent>
     </ContextMenu>
+    </>
   );
 }

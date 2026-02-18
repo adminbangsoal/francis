@@ -1,11 +1,13 @@
 "use client";
 // components
 import { ContextMenu, ContextMenuTrigger } from "@/components/ui/context-menu";
+import Iconify from "@/components/Iconify";
 
 // libs
 import dayjs from "dayjs";
 import "dayjs/locale/id";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 dayjs.locale("id");
@@ -20,6 +22,7 @@ interface CountdownTime {
 }
 
 export default function ComingSoonWarSoal() {
+  const router = useRouter();
   const [countdown, setCountdown] = useState<CountdownTime>({
     days: 0,
     hours: 0,
@@ -119,6 +122,22 @@ export default function ComingSoonWarSoal() {
               </Link>
             </p>
           </div>
+
+          <Link
+            href="/"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (window.history.length > 1) {
+                e.preventDefault();
+                router.back();
+              }
+            }}
+            className="mt-6 flex items-center justify-center gap-2 rounded-full bg-gray-800/95 px-5 py-2.5 text-sm font-600 text-white shadow-xl backdrop-blur-sm transition-all hover:bg-gray-700 hover:scale-105 border border-red-500/50"
+            aria-label="Kembali"
+          >
+            <Iconify icon="ph:arrow-left-bold" className="text-lg" />
+            <span>Kembali</span>
+          </Link>
         </div>
 
         {/* Animated scrolling text at top */}

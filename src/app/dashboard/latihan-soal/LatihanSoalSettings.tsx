@@ -1,6 +1,7 @@
 import { DismissibleBox } from "./DismissibleBox";
 import { LatsolOverview } from "./LatsolOverview";
 import { OngoingLatihan } from "./OngoingLatihan";
+import { PerformanceAnalysis } from "./PerformanceAnalysis";
 import { TopicStatistics } from "./TopicStatistics";
 
 export const LatihanSoalSettings = () => {
@@ -9,6 +10,7 @@ export const LatihanSoalSettings = () => {
       <DismissibleBox />
       <OngoingLatihan />
       <LatsolOverview />
+      <PerformanceAnalysis />
       <TopicStatistics />
     </div>
   );

@@ -1,11 +1,13 @@
 "use client";
 // components
 import { ContextMenu, ContextMenuTrigger } from "@/components/ui/context-menu";
+import Iconify from "@/components/Iconify";
 
 // libs
 import dayjs from "dayjs";
 import "dayjs/locale/id";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 dayjs.locale("id");
@@ -20,6 +22,7 @@ interface CountdownTime {
 }
 
 export default function ComingSoon() {
+  const router = useRouter();
   const [countdown, setCountdown] = useState<CountdownTime>({
     days: 0,
     hours: 0,
@@ -71,9 +74,18 @@ export default function ComingSoon() {
   );
 
   return (
-    <ContextMenu>
-      <ContextMenuTrigger className="fixed inset-0 z-50 flex h-screen flex-col items-center justify-center bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 px-5 backdrop-blur-2xl sm:px-10">
-        <div className="flex flex-col items-center gap-6 sm:gap-8">
+    <>
+      <button
+        onClick={() => router.back()}
+        className="fixed left-5 top-5 z-[100] flex items-center gap-2 rounded-full bg-white/95 px-4 py-2.5 text-sm font-600 text-content-200 shadow-xl backdrop-blur-sm transition-all hover:bg-white hover:scale-105 border border-emerald-200/50 sm:left-10 sm:top-10"
+        aria-label="Kembali"
+      >
+        <Iconify icon="ph:arrow-left-bold" className="text-lg" />
+        <span className="hidden sm:inline">Kembali</span>
+      </button>
+      <ContextMenu>
+        <ContextMenuTrigger className="fixed inset-0 z-50 flex h-screen flex-col items-center justify-center bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 px-5 backdrop-blur-2xl sm:px-10">
+          <div className="flex flex-col items-center gap-6 sm:gap-8">
           <Image
             src="https://bangsoal.s3.ap-southeast-1.amazonaws.com/static/empty-state-under-construction.svg"
             alt="Coming Soon"
@@ -137,5 +149,6 @@ export default function ComingSoon() {
         </div>
       </ContextMenuTrigger>
     </ContextMenu>
+    </>
   );
 }

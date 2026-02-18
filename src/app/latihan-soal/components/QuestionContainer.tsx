@@ -5,7 +5,6 @@ import Iconify from "@/components/Iconify";
 import { cn } from "@/lib/utils";
 import {
   useAttemptLatihanSoalMutation,
-  useDownloadPdfLatihanSoalMutation,
   useGetAttemptLatihanSoalQuery,
   useGetLatihanSoalDetailQuery,
   useGetPembahasanQuery,
@@ -63,12 +62,11 @@ interface QuestionContainerI {
 }
 export const QuestionContainer = ({ slug }: QuestionContainerI) => {
   const [choice, setChoice] = useState<string[]>([]);
+  const [hasAttempted, setHasAttempted] = useState<boolean>(false);
 
   const [disableChoice, setDisableChoice] = useState<boolean>(false);
   const { selectedTopicId, subjects, yearRange, selectedSubject, soalData } =
     useLatihanSoalContext();
-  const [downloadPdf, { isSuccess: successDownload, data: dataPdf }] =
-    useDownloadPdfLatihanSoalMutation();
 
   const { data: attemptQuestionData, isSuccess: finishedGetAttempt } =
     useGetAttemptLatihanSoalQuery(
@@ -112,15 +110,19 @@ export const QuestionContainer = ({ slug }: QuestionContainerI) => {
 
   const [attemptSoal] = useAttemptLatihanSoalMutation();
 
-  const onClickOption = async (
+  const onClickOption = (
     choice_id: string | null,
     content: string,
     choiceIds: string[],
   ) => {
     if (question) {
+      // Immediately set hasAttempted for instant button state update
+      setHasAttempted(true);
+      
+      // Fire and forget - don't await to make UI more responsive
       switch (question.type) {
         case "multiple-answer":
-          await attemptSoal({
+          attemptSoal({
             question_id: question.id,
             choice_id: undefined,
             answer_history: content,
@@ -128,7 +130,7 @@ export const QuestionContainer = ({ slug }: QuestionContainerI) => {
           });
           break;
         default:
-          await attemptSoal({
+          attemptSoal({
             question_id: question.id,
             choice_id: choice_id || undefined,
             answer_history: content,
@@ -147,6 +149,11 @@ export const QuestionContainer = ({ slug }: QuestionContainerI) => {
       } else if (questionType === "multiple-answer") {
         setChoice([...attemptQuestionData?.data.filledAnswers]);
       }
+      
+      // Update hasAttempted state when attempt data is available
+      if (attemptQuestionData.data && !attemptQuestionData.data.submitted) {
+        setHasAttempted(true);
+      }
     }
     if (attemptQuestionData?.data?.submitted) {
       setDisableChoice(true);
@@ -157,6 +164,11 @@ export const QuestionContainer = ({ slug }: QuestionContainerI) => {
     attemptQuestionData?.data?.filledAnswers,
   ]);
 
+  // Reset hasAttempted when question changes
+  useEffect(() => {
+    setHasAttempted(false);
+  }, [slug?.[1]]);
+
   useEffect(() => {
     if (pembahasan && question) {
       if (question.type === "multiple-answer") {
@@ -166,39 +178,6 @@ export const QuestionContainer = ({ slug }: QuestionContainerI) => {
       }
     }
   }, [pembahasan, question]);
-
-  useEffect(() => {
-    if (successDownload) {
-      const URL =
-        process.env.NODE_ENV === "production"
-          ? "https://pdf.bangsoal.co.id"
-          : "http://localhost:3002";
-      window.open(`${URL}/${dataPdf?.data.url}`, "_blank");
-    }
-  }, [successDownload]);
-
-  const renderDownloadPDFButton = () => {
-    return (
-      <button
-        onClick={() => {
-          const subject = slug?.[0] || "";
-          // get object key
-          downloadPdf({
-            subject_id: subjects.filter(
-              (subject) => subject.slug === slug?.[0],
-            )[0]?.id || "",
-            topic_id: selectedTopicId !== "ALL" ? selectedTopicId : undefined,
-            max_year: yearRange[slug?.[0] as string]?.[1] || 2024,
-            min_year: yearRange[slug?.[0] as string]?.[0] || 2009,
-          });
-        }}
-        className="group flex items-center gap-1 rounded-full px-2 text-sm font-500 text-surface-400 duration-200 hover:bg-emerald-400 hover:text-emerald-100 md:flex lg:ml-3"
-      >
-        <Iconify icon="ph:download-simple-bold" />
-        <p className="mb-0 group-hover:block">Download</p>
-      </button>
-    );
-  };
 
   const isChoiceCorrect = (choiceId: string, options: Choice[]) => {
     if (!options) {
@@ -369,9 +348,6 @@ export const QuestionContainer = ({ slug }: QuestionContainerI) => {
                 {question?.topic}
               </h2>
             )}
-            {question && (
-              <div className="hidden lg:block">{renderDownloadPDFButton()}</div>
-            )}
           </div>
           {isLoading ? (
             <div className="skeleton relative mt-2 h-5 w-1/4 rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
@@ -379,9 +355,6 @@ export const QuestionContainer = ({ slug }: QuestionContainerI) => {
             <h2 className="text-xl font-600 text-content-300">
               {question?.label}
             </h2>
-          )}
-          {question && (
-            <div className="lg:hidden">{renderDownloadPDFButton()}</div>
           )}
         </div>
         {isLoading ? (
@@ -407,7 +380,7 @@ export const QuestionContainer = ({ slug }: QuestionContainerI) => {
             data={attemptQuestionData}
             disableCekJawaban={
               pembahasanFetched ||
-              (!attemptQuestionData?.data && question?.type !== "fill-in")
+              (!hasAttempted && !attemptQuestionData?.data && question?.type !== "fill-in")
             }
           />
         )}

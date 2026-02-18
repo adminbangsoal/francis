@@ -91,6 +91,8 @@ export type LatihanSoalBySubjectRequest = {
   min_year?: string;
   max_year?: string;
   question_id?: string;
+  limit?: number;
+  offset?: number;
 };
 
 export type LatihanSoalBySubjectResponse = ResponseWrapper<{
