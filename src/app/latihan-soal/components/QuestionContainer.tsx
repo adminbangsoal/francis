@@ -63,6 +63,8 @@ interface QuestionContainerI {
 export const QuestionContainer = ({ slug }: QuestionContainerI) => {
   const [choice, setChoice] = useState<string[]>([]);
   const [hasAttempted, setHasAttempted] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [localChoice, setLocalChoice] = useState<string[]>([]); // Track user's local selection
 
   const [disableChoice, setDisableChoice] = useState<boolean>(false);
   const { selectedTopicId, subjects, yearRange, selectedSubject, soalData } =
@@ -108,14 +110,23 @@ export const QuestionContainer = ({ slug }: QuestionContainerI) => {
     }
   }, [isSuccess]);
 
-  const [attemptSoal] = useAttemptLatihanSoalMutation();
+  const [attemptSoal, { isLoading: isAttempting }] = useAttemptLatihanSoalMutation();
 
   const onClickOption = (
     choice_id: string | null,
     content: string,
     choiceIds: string[],
   ) => {
-    if (question) {
+    if (question && !disableChoice) {
+      // Update local choice state immediately for responsive UI
+      if (question.type === "multiple-choice") {
+        setLocalChoice([choice_id!]);
+        setChoice([choice_id!]);
+      } else if (question.type === "multiple-answer") {
+        setLocalChoice([...choiceIds]);
+        setChoice([...choiceIds]);
+      }
+      
       // Immediately set hasAttempted for instant button state update
       setHasAttempted(true);
       
@@ -143,11 +154,27 @@ export const QuestionContainer = ({ slug }: QuestionContainerI) => {
   useEffect(() => {
     if (attemptQuestionData?.data) {
       const questionType = attemptQuestionData?.data.type;
+      const serverChoice = questionType === "multiple-choice" 
+        ? (attemptQuestionData?.data?.choice_id ? [attemptQuestionData?.data?.choice_id] : [])
+        : (attemptQuestionData?.data.filledAnswers || []);
 
-      if (questionType === "multiple-choice") {
-        setChoice([attemptQuestionData?.data?.choice_id]);
-      } else if (questionType === "multiple-answer") {
-        setChoice([...attemptQuestionData?.data.filledAnswers]);
+      // Only update choice from server if:
+      // 1. The question was already submitted (pembahasan state) - always trust server
+      // 2. User hasn't made a local selection (localChoice is empty)
+      // 3. Server has valid data and we're not currently attempting (to avoid race condition)
+      const shouldUpdateFromServer = 
+        attemptQuestionData?.data?.submitted || 
+        (localChoice.length === 0 && serverChoice.length > 0 && !isAttempting) ||
+        (serverChoice.length > 0 && !isAttempting && JSON.stringify(serverChoice) !== JSON.stringify(localChoice) && attemptQuestionData?.data?.timestamp);
+
+      if (shouldUpdateFromServer) {
+        if (questionType === "multiple-choice" && attemptQuestionData?.data?.choice_id) {
+          setChoice([attemptQuestionData?.data?.choice_id]);
+          setLocalChoice([attemptQuestionData?.data?.choice_id]);
+        } else if (questionType === "multiple-answer" && attemptQuestionData?.data.filledAnswers?.length > 0) {
+          setChoice([...attemptQuestionData?.data.filledAnswers]);
+          setLocalChoice([...attemptQuestionData?.data.filledAnswers]);
+        }
       }
       
       // Update hasAttempted state when attempt data is available
@@ -157,16 +184,26 @@ export const QuestionContainer = ({ slug }: QuestionContainerI) => {
     }
     if (attemptQuestionData?.data?.submitted) {
       setDisableChoice(true);
+      setIsSubmitting(false);
     }
   }, [
     attemptQuestionData?.data,
     question,
     attemptQuestionData?.data?.filledAnswers,
+    attemptQuestionData?.data?.choice_id,
+    attemptQuestionData?.data?.submitted,
+    attemptQuestionData?.data?.timestamp,
+    isAttempting,
+    localChoice.length,
   ]);
 
-  // Reset hasAttempted when question changes
+  // Reset states when question changes
   useEffect(() => {
     setHasAttempted(false);
+    setLocalChoice([]);
+    setChoice([]);
+    setDisableChoice(false);
+    setIsSubmitting(false);
   }, [slug?.[1]]);
 
   useEffect(() => {
@@ -215,7 +252,6 @@ export const QuestionContainer = ({ slug }: QuestionContainerI) => {
                 setChoice([...choice, choiceId]);
               }
             } else if (question.type == "multiple-choice") {
-              setChoice([choiceId]);
               onClickOption(choiceId, content, []);
             }
           }}
