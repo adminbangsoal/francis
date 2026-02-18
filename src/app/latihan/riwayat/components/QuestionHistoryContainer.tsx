@@ -19,8 +19,37 @@ import { useEffect, useState } from "react";
 import { useRiwayatLatihanSoalContext } from "../context";
 import QuestionHistoryTable from "./QuestionHistoryTable";
 
+const QuestionContentSkeleton = () => {
+  return (
+    <div className="w-full text-gray-500">
+      {/* Question text skeleton */}
+      <div className="mb-6 space-y-3">
+        <div className="skeleton relative h-6 w-full rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
+        <div className="skeleton relative h-6 w-5/6 rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
+        <div className="skeleton relative h-6 w-4/6 rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
+      </div>
+    </div>
+  );
+};
+
+const OptionsSkeleton = () => {
+  return (
+    <div className="flex w-full grid-flow-col grid-cols-2 grid-rows-3 flex-col gap-4 lg:mb-8 lg:grid">
+      {[...Array(5)].map((_, idx) => (
+        <div
+          key={idx}
+          className="flex items-center gap-3 rounded-lg border-2 border-gray-200 bg-white p-3"
+        >
+          <div className="skeleton relative h-8 w-8 shrink-0 rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
+          <div className="skeleton relative h-5 flex-1 rounded bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const QuestionHistoryContainer = () => {
-  const { selectedQuestionId, selectedSubject } =
+  const { selectedQuestionId, selectedSubject, isLoadingSubjects } =
     useRiwayatLatihanSoalContext();
 
   const { data, isLoading } = useGetLatihanSoalHistoryByIdQuery(
@@ -215,36 +244,57 @@ const QuestionHistoryContainer = () => {
   return (
     <div className="flex flex-col gap-5 px-5 lg:px-10">
       <div className="flex flex-col overflow-y-scroll">
-        <h2 className="text-3xl font-700 text-content-100">
-          {selectedSubject?.name}
-        </h2>
+        {isLoadingSubjects ? (
+          <div className="skeleton relative h-9 w-64 rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
+        ) : (
+          <h2 className="text-3xl font-700 text-content-100">
+            {selectedSubject?.name}
+          </h2>
+        )}
         {selectedQuestionId && (
           <>
             {isLoading ? (
-              <div className="skeleton relative mt-2 h-5 w-44 rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
+              <>
+                <div className="skeleton relative mt-2 h-6 w-44 rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
+                <div className="skeleton relative mt-2 h-6 w-1/4 rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
+              </>
             ) : (
-              <h2 className="py-1 text-xl font-600 text-content-300">
-                {data?.data?.question?.topic_name}
-              </h2>
-            )}
-            {isLoading ? (
-              <div className="skeleton relative mt-2 h-5 w-1/4 rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
-            ) : (
-              <h2 className="text-xl font-600 text-content-300">
-                {data?.data?.question?.source} {data?.data?.question?.year}
-              </h2>
+              <>
+                <h2 className="py-1 text-xl font-600 text-content-300">
+                  {data?.data?.question?.topic_name}
+                </h2>
+                <h2 className="text-xl font-600 text-content-300">
+                  {data?.data?.question?.source} {data?.data?.question?.year}
+                </h2>
+              </>
             )}
           </>
         )}
       </div>
       {selectedQuestionId ? (
         <>
-          {data && (
-            <div id="mdown" className="w-full text-gray-500">
-              {renderQuestion(data)}
-            </div>
-          )}
-          {data?.data.attempts.map((attempt) => {
+          {isLoading ? (
+            <>
+              <QuestionContentSkeleton />
+              {/* Date skeleton */}
+              <div className="mb-4 flex w-full items-center">
+                <div className="skeleton relative h-10 w-40 rounded-2xl bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
+                <div className="ml-3 h-[2px] flex-grow rounded-full bg-gray-100"></div>
+              </div>
+              <OptionsSkeleton />
+              {/* Pembahasan skeleton placeholder */}
+              <div className="pb-32 pt-6 md:pb-4 lg:pb-0">
+                <div className="skeleton relative h-32 w-full rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
+              </div>
+            </>
+          ) : (
+            <>
+              {data && (
+                <div id="mdown" className="w-full text-gray-500">
+                  {renderQuestion(data)}
+                </div>
+              )}
+              {data?.data.attempts.map((attempt) => {
             return (
               <div key={attempt.id}>
                 <div className="mb-4 flex w-full items-center">
@@ -273,6 +323,8 @@ const QuestionHistoryContainer = () => {
               </div>
             );
           })}
+            </>
+          )}
         </>
       ) : (
         <>

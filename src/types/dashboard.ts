@@ -21,6 +21,7 @@ export type DashboardResponse = ResponseWrapper<
       topic: string;
       correct: number;
       total_question: number;
+      total_attempt: number;
     }[];
     icon: string;
     total_correct_answer: number;

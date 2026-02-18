@@ -15,7 +15,7 @@ export default function Filters({
   subject_id,
   selectedSubject,
 }: IFilters) {
-  const { data: topicData } = useGetTopicsBySubjectQuery(
+  const { data: topicData, isLoading } = useGetTopicsBySubjectQuery(
     { subject_id },
     // {
     //   skip: SELECTED_SUBJECT_MAPPING[category] !== selectedSubject,
@@ -32,7 +32,9 @@ export default function Filters({
           >
             Topik:
           </Label.Root>
-          {selectedSubject && (
+          {isLoading ? (
+            <div className="skeleton relative h-6 flex-1 rounded bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
+          ) : selectedSubject ? (
             <Select.Root
               value={currentTopic[selectedSubject.slug]}
               onValueChange={(value) => {
@@ -94,7 +96,7 @@ export default function Filters({
                 </Select.Content>
               </Select.Portal>
             </Select.Root>
-          )}
+          ) : null}
         </div>
       </div>
     </div>

@@ -1,21 +1,62 @@
 import Iconify from "@/components/Iconify";
 import { Subject } from "@/types";
 import * as Accordion from "@radix-ui/react-accordion";
+import * as Tabs from "@radix-ui/react-tabs";
 import Image from "next/image";
 import Link from "next/link";
 import MediaQuery from "react-responsive";
+import { AutoSizer, List } from "react-virtualized";
 import { useRiwayatLatihanSoalContext } from "../context";
 import Filters from "./Filters";
 import SoalSelector from "./SoalSelector";
 
-const SubjectSkeleton = () => {
+const SubjectSkeleton = ({ isExpanded = false }: { isExpanded?: boolean }) => {
   return (
-    <div className="group relative flex flex-col rounded-xl bg-cover data-[state=closed]:h-11">
-      <div className="group z-10 flex w-full items-center gap-2 rounded-xl px-3 py-2">
+    <div className={`group relative flex flex-col rounded-xl bg-cover ${
+      isExpanded ? "grow" : "h-11"
+    }`}>
+      <div className="group z-10 flex w-full items-center gap-2 rounded-xl rounded-b-none px-3 py-2 text-xl font-[650]">
         <div className="skeleton relative h-5 w-5 rounded bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
         <div className="skeleton relative h-5 w-32 rounded bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
         <div className="skeleton relative h-5 w-5 rounded bg-surface-300 from-surface-300 via-surface-100 to-surface-300 ml-auto"></div>
       </div>
+      {isExpanded && (
+        <div className="z-10 flex grow flex-col rounded-b-xl bg-gray-300 px-1 pb-1">
+          {/* Filters Skeleton */}
+          <div className="flex flex-col rounded-lg bg-gray-400 px-3 py-2">
+            <div className="flex flex-col gap-1 text-sm">
+              <div className="flex items-center gap-2">
+                <div className="skeleton relative h-4 w-12 shrink-0 rounded bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
+                <div className="skeleton relative h-6 flex-1 rounded bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
+              </div>
+            </div>
+          </div>
+          {/* SoalSelector Skeleton - using same layout as actual SoalSelector */}
+          <Tabs.Root
+            value="tab-1"
+            orientation="vertical"
+            className="grow"
+          >
+            <Tabs.List className="flex h-full w-full flex-col gap-1">
+              <AutoSizer>
+                {({ height, width }) => (
+                  <List
+                    height={height}
+                    width={width}
+                    rowCount={6}
+                    rowHeight={70}
+                    rowRenderer={({ index, key, style }) => (
+                      <div key={key} style={style} className="flex flex-col items-center">
+                        <div className="skeleton relative h-[4.25rem] w-full rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
+                      </div>
+                    )}
+                  />
+                )}
+              </AutoSizer>
+            </Tabs.List>
+          </Tabs.Root>
+        </div>
+      )}
     </div>
   );
 };
@@ -45,8 +86,11 @@ const RiwayatSoalAsideDesktop = () => {
         <div className="flex grow flex-col gap-5 px-5 pb-5 text-content-300">
           {isLoadingSubjects ? (
             <div className="flex grow flex-col gap-2">
-              {[...Array(6)].map((_, idx) => (
-                <SubjectSkeleton key={idx} />
+              {/* First subject expanded (like when data is loaded) */}
+              <SubjectSkeleton isExpanded={true} />
+              {/* Other subjects collapsed */}
+              {[...Array(5)].map((_, idx) => (
+                <SubjectSkeleton key={idx} isExpanded={false} />
               ))}
             </div>
           ) : selectedSubject ? (

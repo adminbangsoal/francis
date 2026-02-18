@@ -75,45 +75,34 @@ export const PerformanceAnalysis = () => {
   }
 
   // Calculate analysis data
-  // Note: total_question from backend is total questions available, not total attempts
-  // We only have 'correct' count, so we need to calculate based on attempted topics
+  // Now we have total_attempt from backend, so we can calculate accurate accuracy
   const subjectAnalyses: SubjectAnalysis[] = data.data.map((subjectData) => {
     // Calculate total attempted and correct for this subject
-    // We count topics that have been attempted (correct > 0) and sum their correct answers
     let totalAttempted = 0;
     let totalCorrect = 0;
     const weakTopics: SubjectAnalysis["weakTopics"] = [];
 
     subjectData.topics.forEach((topic) => {
-      // Only count topics that have been attempted (correct > 0)
-      // Since we don't have total attempt count, we use correct as indicator
-      if (topic.correct > 0) {
-        // For accuracy calculation, we need to estimate based on correct count
-        // Since we don't have total attempt, we'll use a different approach:
-        // Show topics with low correct count relative to available questions
-        // or topics where correct count is low (indicating poor performance)
-        
-        // Calculate a performance score: correct / total_question (as percentage of available)
-        // This gives us an idea of mastery level
-        const performanceScore =
-          topic.total_question > 0
-            ? (topic.correct / topic.total_question) * 100
+      // Only process topics that have been attempted
+      if (topic.total_attempt > 0) {
+        // Calculate accurate accuracy: correct / total_attempt
+        const topicAccuracy =
+          topic.total_attempt > 0
+            ? (topic.correct / topic.total_attempt) * 100
             : 0;
 
-        // Consider a topic "weak" if performance score < 70% of available questions
-        // This means user has attempted but hasn't mastered the topic
-        if (performanceScore < 70) {
+        // Include topics with accuracy < 70% as weak topics
+        if (topicAccuracy < 70) {
           weakTopics.push({
             topic: topic.topic,
-            accuracy: performanceScore, // This is mastery level, not true accuracy
+            accuracy: topicAccuracy,
             correct: topic.correct,
-            total: topic.total_question, // Total available, not total attempted
+            total: topic.total_attempt, // Use total_attempt, not total_question
           });
         }
 
-        // For subject-level calculation, we sum up correct answers
-        // Note: This is not true accuracy since we don't have total attempt
-        totalAttempted += topic.total_question; // Using available as proxy
+        // For subject-level calculation, sum up attempts and correct answers
+        totalAttempted += topic.total_attempt;
         totalCorrect += topic.correct;
       }
     });
@@ -121,8 +110,7 @@ export const PerformanceAnalysis = () => {
     // Sort weak topics by accuracy (lowest first)
     weakTopics.sort((a, b) => a.accuracy - b.accuracy);
 
-    // Calculate subject-level performance
-    // This is an approximation since we don't have total attempt count
+    // Calculate subject-level accuracy
     const accuracy =
       totalAttempted > 0 ? (totalCorrect / totalAttempted) * 100 : 0;
 
@@ -150,14 +138,24 @@ export const PerformanceAnalysis = () => {
   // Get all weak topics across all subjects, sorted by accuracy
   const allWeakTopics = subjectAnalyses
     .flatMap((subject) =>
-      subject.weakTopics.map((topic) => ({
-        ...topic,
-        subjectName: subject.subject,
-        subjectSlug: subject.slug,
-        subjectIcon: subject.icon,
-        // Calculate how many questions need to be practiced to reach 70%
-        questionsNeeded: Math.ceil((topic.total * 0.7 - topic.correct) / 0.3),
-      })),
+      subject.weakTopics.map((topic) => {
+        // Calculate how many correct answers needed to reach 70% accuracy
+        // If current accuracy is X% and we want 70%, we need:
+        // (correct + needed) / (total_attempt + needed) = 0.7
+        // Solving: needed = (0.7 * total_attempt - correct) / 0.3
+        const questionsNeeded = Math.max(
+          0,
+          Math.ceil((topic.total * 0.7 - topic.correct) / 0.3),
+        );
+        
+        return {
+          ...topic,
+          subjectName: subject.subject,
+          subjectSlug: subject.slug,
+          subjectIcon: subject.icon,
+          questionsNeeded,
+        };
+      }),
     )
     .sort((a, b) => a.accuracy - b.accuracy)
     .slice(0, 8); // Top 8 weakest topics overall
