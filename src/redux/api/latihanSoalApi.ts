@@ -107,7 +107,7 @@ export const latihanSoal = baseApi.injectEndpoints({
       LatihanSoalBySubjectResponse,
       LatihanSoalBySubjectRequest
     >({
-      query: ({ subject_id, ...params }) => ({
+      query: ({ subject_id, limit, offset, ...params }) => ({
         url: `/latihan-soal/subject/${subject_id}`,
         method: "GET",
         params: {
@@ -115,11 +115,41 @@ export const latihanSoal = baseApi.injectEndpoints({
           question_id: params.question_id,
           min_year: params.min_year ?? undefined,
           max_year: params.max_year ?? undefined,
+          limit: limit ?? undefined,
+          offset: offset ?? undefined,
         },
       }),
       providesTags: (result, error, { subject_id }) => [
         { type: "LatihanSoal", id: subject_id, ...result },
       ],
+      merge: (currentCache, newItems, { arg }) => {
+        // Merge results for progressive loading
+        if (arg.limit && arg.offset) {
+          // If paginated, merge arrays
+          const existingIds = new Set(currentCache?.data?.questions?.map(q => q.id) || []);
+          const newQuestions = newItems?.data?.questions?.filter(q => !existingIds.has(q.id)) || [];
+          return {
+            ...newItems,
+            data: {
+              questions: [
+                ...(currentCache?.data?.questions || []),
+                ...newQuestions,
+              ],
+            },
+          };
+        }
+        return newItems;
+      },
+      forceRefetch: ({ currentArg, previousArg }) => {
+        // Only refetch if params changed (not for pagination)
+        return (
+          currentArg?.subject_id !== previousArg?.subject_id ||
+          currentArg?.topic_id !== previousArg?.topic_id ||
+          currentArg?.min_year !== previousArg?.min_year ||
+          currentArg?.max_year !== previousArg?.max_year ||
+          currentArg?.question_id !== previousArg?.question_id
+        );
+      },
     }),
     getLatihanSoalDetail: builder.query<
       SoalQuestionDetailResponse,
@@ -152,6 +182,41 @@ export const latihanSoal = baseApi.injectEndpoints({
         method: "POST",
         body,
       }),
+      async onQueryStarted({ question_id }, { dispatch, queryFulfilled }) {
+        // Optimistic update: immediately update cache to make button responsive
+        const patchResult = dispatch(
+          latihanSoal.util.updateQueryData(
+            "getAttemptLatihanSoal",
+            { question_id },
+            (draft) => {
+              // Create optimistic attempt data if not exists
+              if (!draft?.data) {
+                Object.assign(draft, {
+                  data: {
+                    id: `temp-${Date.now()}`,
+                    question_id,
+                    options_id: "",
+                    choice_id: "",
+                    answer_history: "",
+                    timestamp: new Date().toISOString(),
+                    submission_img: "",
+                    submission_text: "",
+                    user_id: "",
+                    filledAnswers: [],
+                    type: "multiple-choice" as const,
+                  },
+                });
+              }
+            }
+          )
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          // Revert on error
+          patchResult.undo();
+        }
+      },
       invalidatesTags: (result, error, { question_id }) => [
         { type: "LatihanSoalAttempt", id: question_id },
       ],

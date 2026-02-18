@@ -1,11 +1,13 @@
 "use client";
 // components
 import { ContextMenu, ContextMenuTrigger } from "@/components/ui/context-menu";
+import Iconify from "@/components/Iconify";
 
 // libs
 import dayjs from "dayjs";
 import "dayjs/locale/id";
-import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 dayjs.locale("id");
@@ -20,6 +22,7 @@ interface CountdownTime {
 }
 
 export default function ComingSoonTryoutAkbar() {
+  const router = useRouter();
   const [countdown, setCountdown] = useState<CountdownTime>({
     days: 0,
     hours: 0,
@@ -53,6 +56,7 @@ export default function ComingSoonTryoutAkbar() {
     return () => clearInterval(interval);
   }, []);
 
+
   const CountdownCard = ({
     label,
     value,
@@ -74,15 +78,6 @@ export default function ComingSoonTryoutAkbar() {
     <ContextMenu>
       <ContextMenuTrigger className="fixed inset-0 z-50 flex h-screen flex-col items-center justify-center bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 px-5 backdrop-blur-2xl sm:px-10">
         <div className="flex flex-col items-center gap-6 sm:gap-8">
-          <Image
-            src="https://bangsoal.s3.ap-southeast-1.amazonaws.com/static/empty-state-under-construction.svg"
-            alt="Coming Soon"
-            width={400}
-            height={260}
-            loading="eager"
-            className="w-64 sm:w-80"
-            unoptimized
-          />
 
           <div className="flex flex-col items-center gap-3 py-5">
             <h1 className="text-center text-3xl font-bold sm:text-4xl md:text-5xl">
@@ -106,10 +101,26 @@ export default function ComingSoonTryoutAkbar() {
               <CountdownCard label="Detik" value={countdown.seconds} />
             </div>
           </div>
+
+          <Link
+            href="/"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (window.history.length > 1) {
+                e.preventDefault();
+                router.back();
+              }
+            }}
+            className="mt-6 flex items-center justify-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-600 text-content-200 shadow-xl transition-all hover:bg-emerald-50 hover:scale-105 border-2 border-emerald-400"
+            aria-label="Kembali"
+          >
+            <Iconify icon="ph:arrow-left-bold" className="text-lg" />
+            <span>Kembali</span>
+          </Link>
         </div>
 
         {/* Animated scrolling text at top */}
-        <div className="absolute top-1 -rotate-6 bg-[url('/bg-mesh-horizontal.webp')] bg-cover bg-center shadow-md">
+        <div className="absolute top-1 -rotate-6 bg-[url('/bg-mesh-horizontal.webp')] bg-cover bg-center shadow-md pointer-events-none" style={{ zIndex: 1 }}>
           <div className="flex animate-infinite-track">
             {[...Array(20)].map((e, i) => (
               <p
@@ -123,7 +134,7 @@ export default function ComingSoonTryoutAkbar() {
         </div>
 
         {/* Animated scrolling text at bottom */}
-        <div className="absolute bottom-0 rotate-3 bg-[url('/bg-mesh-horizontal.webp')] bg-cover bg-center shadow-md">
+        <div className="absolute bottom-0 rotate-3 bg-[url('/bg-mesh-horizontal.webp')] bg-cover bg-center shadow-md pointer-events-none">
           <div className="flex animate-infinite-track">
             {[...Array(20)].map((e, i) => (
               <p

@@ -97,6 +97,23 @@ export const LatihanSoalProvider: React.FC<Props> = ({ children }) => {
       const subject = subjects.findIndex((item) => item.slug === slug?.[0]);
       setSelectedSubject(subjects[subject]);
       setActiveSubjectIndex(subject);
+      
+      // Check if there's a topic_id stored in sessionStorage for this subject
+      if (typeof window !== "undefined") {
+        const storedTopicId = sessionStorage.getItem(
+          `latihan-soal-topic-${slug[0]}`,
+        );
+        if (storedTopicId && storedTopicId !== "ALL") {
+          // Set the topic filter for this subject
+          setCurrentTopic((prev) => ({
+            ...prev,
+            [slug[0]]: storedTopicId,
+          }));
+          setSelectedTopicId(storedTopicId);
+          // Clear the stored topic_id after using it
+          sessionStorage.removeItem(`latihan-soal-topic-${slug[0]}`);
+        }
+      }
     }
   }, [slug?.[0], subjects.length]);
 

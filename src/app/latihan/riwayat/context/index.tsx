@@ -25,6 +25,7 @@ interface RiwayatLatihanSoalContextType {
   setSelectedQuestionId: React.Dispatch<React.SetStateAction<string>>;
   activeSubjectIndex: number;
   setActiveSubjectIndex: React.Dispatch<React.SetStateAction<number>>;
+  isLoadingSubjects: boolean;
 }
 
 export const RiwayatLatihanSoalContext =
@@ -40,6 +41,7 @@ export const RiwayatLatihanSoalProvider: React.FC<Props> = ({ children }) => {
   const [fetchSubjects] = useLazyGetSubjectsQuery();
 
   const [selectedQuestionId, setSelectedQuestionId] = useState<string>("");
+  const [isLoadingSubjects, setIsLoadingSubjects] = useState<boolean>(true);
 
   const [subjects, setSubjects] = useState<Subject[]>();
   const [selectedSubject, setSelectedSubject] = useState<Subject>();
@@ -55,6 +57,7 @@ export const RiwayatLatihanSoalProvider: React.FC<Props> = ({ children }) => {
   const [activeSubjectIndex, setActiveSubjectIndex] = useState<number>(0);
 
   useEffect(() => {
+    setIsLoadingSubjects(true);
     fetchSubjects().then(({ isSuccess, data }) => {
       if (isSuccess) {
         setSubjects(data.data);
@@ -76,6 +79,7 @@ export const RiwayatLatihanSoalProvider: React.FC<Props> = ({ children }) => {
           setCurrentTopic(temp);
         }
       }
+      setIsLoadingSubjects(false);
     });
   }, []);
 
@@ -93,6 +97,7 @@ export const RiwayatLatihanSoalProvider: React.FC<Props> = ({ children }) => {
         setSelectedQuestionId,
         activeSubjectIndex,
         setActiveSubjectIndex,
+        isLoadingSubjects,
       };
       return val;
     },
@@ -102,6 +107,7 @@ export const RiwayatLatihanSoalProvider: React.FC<Props> = ({ children }) => {
       yearRange,
       currentTopic,
       selectedQuestionId,
+      isLoadingSubjects,
     ] as const,
   );
 

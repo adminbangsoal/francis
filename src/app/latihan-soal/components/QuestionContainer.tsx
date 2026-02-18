@@ -5,7 +5,6 @@ import Iconify from "@/components/Iconify";
 import { cn } from "@/lib/utils";
 import {
   useAttemptLatihanSoalMutation,
-  useDownloadPdfLatihanSoalMutation,
   useGetAttemptLatihanSoalQuery,
   useGetLatihanSoalDetailQuery,
   useGetPembahasanQuery,
@@ -63,12 +62,13 @@ interface QuestionContainerI {
 }
 export const QuestionContainer = ({ slug }: QuestionContainerI) => {
   const [choice, setChoice] = useState<string[]>([]);
+  const [hasAttempted, setHasAttempted] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [localChoice, setLocalChoice] = useState<string[]>([]); // Track user's local selection
 
   const [disableChoice, setDisableChoice] = useState<boolean>(false);
   const { selectedTopicId, subjects, yearRange, selectedSubject, soalData } =
     useLatihanSoalContext();
-  const [downloadPdf, { isSuccess: successDownload, data: dataPdf }] =
-    useDownloadPdfLatihanSoalMutation();
 
   const { data: attemptQuestionData, isSuccess: finishedGetAttempt } =
     useGetAttemptLatihanSoalQuery(
@@ -110,17 +110,30 @@ export const QuestionContainer = ({ slug }: QuestionContainerI) => {
     }
   }, [isSuccess]);
 
-  const [attemptSoal] = useAttemptLatihanSoalMutation();
+  const [attemptSoal, { isLoading: isAttempting }] = useAttemptLatihanSoalMutation();
 
-  const onClickOption = async (
+  const onClickOption = (
     choice_id: string | null,
     content: string,
     choiceIds: string[],
   ) => {
-    if (question) {
+    if (question && !disableChoice) {
+      // Update local choice state immediately for responsive UI
+      if (question.type === "multiple-choice") {
+        setLocalChoice([choice_id!]);
+        setChoice([choice_id!]);
+      } else if (question.type === "multiple-answer") {
+        setLocalChoice([...choiceIds]);
+        setChoice([...choiceIds]);
+      }
+      
+      // Immediately set hasAttempted for instant button state update
+      setHasAttempted(true);
+      
+      // Fire and forget - don't await to make UI more responsive
       switch (question.type) {
         case "multiple-answer":
-          await attemptSoal({
+          attemptSoal({
             question_id: question.id,
             choice_id: undefined,
             answer_history: content,
@@ -128,7 +141,7 @@ export const QuestionContainer = ({ slug }: QuestionContainerI) => {
           });
           break;
         default:
-          await attemptSoal({
+          attemptSoal({
             question_id: question.id,
             choice_id: choice_id || undefined,
             answer_history: content,
@@ -141,21 +154,57 @@ export const QuestionContainer = ({ slug }: QuestionContainerI) => {
   useEffect(() => {
     if (attemptQuestionData?.data) {
       const questionType = attemptQuestionData?.data.type;
+      const serverChoice = questionType === "multiple-choice" 
+        ? (attemptQuestionData?.data?.choice_id ? [attemptQuestionData?.data?.choice_id] : [])
+        : (attemptQuestionData?.data.filledAnswers || []);
 
-      if (questionType === "multiple-choice") {
-        setChoice([attemptQuestionData?.data?.choice_id]);
-      } else if (questionType === "multiple-answer") {
-        setChoice([...attemptQuestionData?.data.filledAnswers]);
+      // Only update choice from server if:
+      // 1. The question was already submitted (pembahasan state) - always trust server
+      // 2. User hasn't made a local selection (localChoice is empty)
+      // 3. Server has valid data and we're not currently attempting (to avoid race condition)
+      const shouldUpdateFromServer = 
+        attemptQuestionData?.data?.submitted || 
+        (localChoice.length === 0 && serverChoice.length > 0 && !isAttempting) ||
+        (serverChoice.length > 0 && !isAttempting && JSON.stringify(serverChoice) !== JSON.stringify(localChoice) && attemptQuestionData?.data?.timestamp);
+
+      if (shouldUpdateFromServer) {
+        if (questionType === "multiple-choice" && attemptQuestionData?.data?.choice_id) {
+          setChoice([attemptQuestionData?.data?.choice_id]);
+          setLocalChoice([attemptQuestionData?.data?.choice_id]);
+        } else if (questionType === "multiple-answer" && attemptQuestionData?.data.filledAnswers?.length > 0) {
+          setChoice([...attemptQuestionData?.data.filledAnswers]);
+          setLocalChoice([...attemptQuestionData?.data.filledAnswers]);
+        }
+      }
+      
+      // Update hasAttempted state when attempt data is available
+      if (attemptQuestionData.data && !attemptQuestionData.data.submitted) {
+        setHasAttempted(true);
       }
     }
     if (attemptQuestionData?.data?.submitted) {
       setDisableChoice(true);
+      setIsSubmitting(false);
     }
   }, [
     attemptQuestionData?.data,
     question,
     attemptQuestionData?.data?.filledAnswers,
+    attemptQuestionData?.data?.choice_id,
+    attemptQuestionData?.data?.submitted,
+    attemptQuestionData?.data?.timestamp,
+    isAttempting,
+    localChoice.length,
   ]);
+
+  // Reset states when question changes
+  useEffect(() => {
+    setHasAttempted(false);
+    setLocalChoice([]);
+    setChoice([]);
+    setDisableChoice(false);
+    setIsSubmitting(false);
+  }, [slug?.[1]]);
 
   useEffect(() => {
     if (pembahasan && question) {
@@ -166,39 +215,6 @@ export const QuestionContainer = ({ slug }: QuestionContainerI) => {
       }
     }
   }, [pembahasan, question]);
-
-  useEffect(() => {
-    if (successDownload) {
-      const URL =
-        process.env.NODE_ENV === "production"
-          ? "https://pdf.bangsoal.co.id"
-          : "http://localhost:3002";
-      window.open(`${URL}/${dataPdf?.data.url}`, "_blank");
-    }
-  }, [successDownload]);
-
-  const renderDownloadPDFButton = () => {
-    return (
-      <button
-        onClick={() => {
-          const subject = slug?.[0] || "";
-          // get object key
-          downloadPdf({
-            subject_id: subjects.filter(
-              (subject) => subject.slug === slug?.[0],
-            )[0]?.id || "",
-            topic_id: selectedTopicId !== "ALL" ? selectedTopicId : undefined,
-            max_year: yearRange[slug?.[0] as string]?.[1] || 2024,
-            min_year: yearRange[slug?.[0] as string]?.[0] || 2009,
-          });
-        }}
-        className="group flex items-center gap-1 rounded-full px-2 text-sm font-500 text-surface-400 duration-200 hover:bg-emerald-400 hover:text-emerald-100 md:flex lg:ml-3"
-      >
-        <Iconify icon="ph:download-simple-bold" />
-        <p className="mb-0 group-hover:block">Download</p>
-      </button>
-    );
-  };
 
   const isChoiceCorrect = (choiceId: string, options: Choice[]) => {
     if (!options) {
@@ -236,7 +252,6 @@ export const QuestionContainer = ({ slug }: QuestionContainerI) => {
                 setChoice([...choice, choiceId]);
               }
             } else if (question.type == "multiple-choice") {
-              setChoice([choiceId]);
               onClickOption(choiceId, content, []);
             }
           }}
@@ -369,9 +384,6 @@ export const QuestionContainer = ({ slug }: QuestionContainerI) => {
                 {question?.topic}
               </h2>
             )}
-            {question && (
-              <div className="hidden lg:block">{renderDownloadPDFButton()}</div>
-            )}
           </div>
           {isLoading ? (
             <div className="skeleton relative mt-2 h-5 w-1/4 rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
@@ -379,9 +391,6 @@ export const QuestionContainer = ({ slug }: QuestionContainerI) => {
             <h2 className="text-xl font-600 text-content-300">
               {question?.label}
             </h2>
-          )}
-          {question && (
-            <div className="lg:hidden">{renderDownloadPDFButton()}</div>
           )}
         </div>
         {isLoading ? (
@@ -407,7 +416,7 @@ export const QuestionContainer = ({ slug }: QuestionContainerI) => {
             data={attemptQuestionData}
             disableCekJawaban={
               pembahasanFetched ||
-              (!attemptQuestionData?.data && question?.type !== "fill-in")
+              (!hasAttempted && !attemptQuestionData?.data && question?.type !== "fill-in")
             }
           />
         )}
