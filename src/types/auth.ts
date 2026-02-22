@@ -17,6 +17,8 @@ export type SigninResponse = ResponseWrapper<{
     phone_number: string;
     onboard_date: string;
     profile_picture: string;
+    role?: 'user' | 'admin';
+    is_admin?: boolean;
   };
 }>;
 export type SignupResponse = SigninResponse;

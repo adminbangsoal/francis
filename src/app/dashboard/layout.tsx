@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import DashboardAside from "./DashboardAside";
+import WithAdminRedirect from "./withAdminRedirect";
 
 export const metadata: Metadata = {
   title: "Dashboard | BangSoal",
@@ -13,12 +14,14 @@ function DashboardPageLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="flex w-full flex-col  lg:flex-row">
-      <DashboardAside />
-      <div className="relative grow border-t border-gray-300 px-4 lg:h-[100vh] lg:overflow-y-scroll">
-        {children}
+    <WithAdminRedirect>
+      <div className="flex w-full flex-col  lg:flex-row">
+        <DashboardAside />
+        <div className="relative grow border-t border-gray-300 px-4 lg:h-[100vh] lg:overflow-y-scroll">
+          {children}
+        </div>
       </div>
-    </div>
+    </WithAdminRedirect>
   );
 }
 

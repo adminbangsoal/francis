@@ -21,11 +21,11 @@ function handleExplanation(explanation: string): JSX.Element[] {
     const elements: JSX.Element[] = [];
 
     parts.forEach((part, i) => {
-      elements.push(handleKatex(part));
+      elements.push(handleKatex(part, `part-${i}`));
       if (i < parts.length - 1) {
         elements.push(
           <i
-            key={part}
+            key={`arrow-${i}`}
             className="i-ph-arrow-right-bold mx-1 size-4 translate-y-[3px]"
           />,
         );
@@ -33,32 +33,32 @@ function handleExplanation(explanation: string): JSX.Element[] {
     });
 
     return (
-      <p key={line} className="font-500 leading-snug">
+      <div key={`line-${line}`} className="font-500 leading-snug">
         {elements}
-      </p>
+      </div>
     );
   });
 }
 
-function handleKatex(text: string): JSX.Element {
+function handleKatex(text: string, key?: string): JSX.Element {
   const parts = text.split(/(--.*?--)/);
   return (
-    <div className="flex flex-wrap">
-      {parts.map((part) => {
+    <span key={key} className="flex flex-wrap">
+      {parts.map((part, index) => {
         if (part.startsWith("--") && part.endsWith("--")) {
           const katex: string = part.slice(2, -2);
           return (
             <RenderMarkdown
-              key={part}
+              key={`katex-${index}`}
               markdown={`$${katex}$`}
               className="text-base font-500"
             />
           );
         } else {
-          return <Fragment key={part}>{part}</Fragment>;
+          return <Fragment key={`text-${index}`}>{part}</Fragment>;
         }
       })}
-    </div>
+    </span>
   );
 }
 
@@ -66,11 +66,12 @@ export default function Quiz({ topic }: Readonly<{ topic: string }>) {
   const [answered, setAnswered] = useState(false);
   const [value, setValue] = useState<string[]>([]);
 
-  function handleChange(value: string[]) {
+  function handleChange(val: string[]) {
     if (!answered) {
       setAnswered(true);
-      !value.includes("answer") && value.push("answer");
-      setValue(value);
+      const newValue = [...val];
+      !newValue.includes("answer") && newValue.push("answer");
+      setValue(newValue);
     }
   }
 
@@ -91,7 +92,7 @@ export default function Quiz({ topic }: Readonly<{ topic: string }>) {
   const isInView = useInView(ref, { amount: 1 });
 
   useEffect(() => {
-    let timer: NodeJS.Timeout;
+    let timer: NodeJS.Timeout | null = null;
     if (isInView) {
       timer = setInterval(() => {
         setRemainingTime((prevTime) => (prevTime > 0 ? prevTime - 1 : 0));
@@ -101,8 +102,10 @@ export default function Quiz({ topic }: Readonly<{ topic: string }>) {
       setRemainingTime(0);
     }
 
-    // Clean up the interval on unmount or when isInView changes
-    return () => clearInterval(timer);
+    // Clean up interval on unmount or when isInView changes
+    return () => {
+      if (timer) clearInterval(timer);
+    };
   }, [isInView, answered]);
 
   const remainingPercentage = (remainingTime / 60) * 100;
@@ -177,9 +180,7 @@ export default function Quiz({ topic }: Readonly<{ topic: string }>) {
       <ToggleGroup
         type="multiple"
         value={remainingTime === 0 ? [...value, "answer"] : value}
-        onValueChange={(value: any) => {
-          handleChange(value);
-        }}
+        onValueChange={handleChange}
         disabled={answered || remainingTime === 0}
         className="flex flex-col gap-1 pt-3"
       >

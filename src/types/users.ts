@@ -37,6 +37,8 @@ export type User = {
   phone_number: string;
   onboard_date: string;
   profile_img: string;
+  role?: 'user' | 'admin';
+  is_admin?: boolean;
 };
 
 export type LeaderboardUser = Pick<User, "full_name" | "highschool"> & {
