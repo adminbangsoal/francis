@@ -7,7 +7,11 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { PieChart } from "@mui/x-charts/PieChart";
 import { useInView } from "framer-motion";
 import { Fragment, useEffect, useRef, useState } from "react";
-import RenderMarkdown from "../latihan-soal/components/RenderMarkdown";
+import dynamic from "next/dynamic";
+
+const RenderMarkdown = dynamic(() => import("../latihan-soal/components/RenderMarkdown"), {
+  loading: () => <div className="h-20 animate-pulse bg-gray-200" />,
+});
 
 // data
 import { sampleSoal } from "@/data/landing";
