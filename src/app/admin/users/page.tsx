@@ -20,15 +20,10 @@ import {
 } from "@/components/ui/select";
 import {
   UserPlus,
-  Users,
-  Crown,
-  User as UserIcon,
-  Activity,
   Search,
-  Pencil,
-  Trash2,
   Loader2,
   AlertCircle,
+  Crown,
 } from "lucide-react";
 import { apiConfig } from "@/redux/api/config";
 import { toast } from "react-hot-toast";
@@ -38,7 +33,7 @@ interface User {
   name: string;
   email: string;
   role: "admin" | "user";
-  subscription: "free" | "premium";
+  subscription: "pemula" | "setia" | "ambis";
   createdAt: string;
   lastActive: string;
 }
@@ -87,7 +82,7 @@ export default function UsersPage() {
           name: "Budi Santoso",
           email: "budi@email.com",
           role: "user",
-          subscription: "premium",
+          subscription: "ambis",
           createdAt: "2024-01-15",
           lastActive: "2 hours ago",
         },
@@ -96,7 +91,7 @@ export default function UsersPage() {
           name: "Siti Rahayu",
           email: "siti@email.com",
           role: "user",
-          subscription: "free",
+          subscription: "pemula",
           createdAt: "2024-01-18",
           lastActive: "5 hours ago",
         },
@@ -105,7 +100,7 @@ export default function UsersPage() {
           name: "Ahmad Wijaya",
           email: "ahmad@email.com",
           role: "admin",
-          subscription: "premium",
+          subscription: "ambis",
           createdAt: "2024-01-20",
           lastActive: "1 day ago",
         },
@@ -114,7 +109,7 @@ export default function UsersPage() {
           name: "Dewi Putri",
           email: "dewi@email.com",
           role: "user",
-          subscription: "premium",
+          subscription: "setia",
           createdAt: "2024-01-22",
           lastActive: "3 days ago",
         },
@@ -123,7 +118,7 @@ export default function UsersPage() {
           name: "Rudi Hartono",
           email: "rudi@email.com",
           role: "user",
-          subscription: "free",
+          subscription: "pemula",
           createdAt: "2024-01-25",
           lastActive: "1 week ago",
         },
@@ -162,7 +157,7 @@ export default function UsersPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold tracking-tight text-gray-900">Users</h2>
-          <p className="mt-1 text-sm text-gray-500">Manage your platform users</p>
+          <p className="mt-1 text-sm text-gray-500">Manage platform users</p>
         </div>
         <div className="flex items-center gap-3">
           {/* NOTE: Add User functionality requires backend API implementation */}
@@ -174,62 +169,6 @@ export default function UsersPage() {
             <UserPlus className="mr-2 h-4 w-4" />
             Add User
           </Button>
-        </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50">
-              <Users className="h-6 w-6 text-emerald-600" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Total Users</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {users.length}
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50">
-              <Crown className="h-6 w-6 text-amber-500" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Premium</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {users.filter((u) => u.subscription === "premium").length}
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50">
-              <UserIcon className="h-6 w-6 text-blue-600" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Free</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {users.filter((u) => u.subscription === "free").length}
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-teal-50">
-              <Activity className="h-6 w-6 text-teal-600" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-500">Active Now</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {users.filter((u) => u.lastActive.includes("hours") || u.lastActive.includes("mins")).length}
-              </p>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -261,8 +200,9 @@ export default function UsersPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Plans</SelectItem>
-              <SelectItem value="premium">Premium</SelectItem>
-              <SelectItem value="free">Free</SelectItem>
+              <SelectItem value="pemula">Pemula</SelectItem>
+              <SelectItem value="setia">Setia</SelectItem>
+              <SelectItem value="ambis">Ambis</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -291,8 +231,6 @@ export default function UsersPage() {
               <TableHead className="h-12 font-semibold text-gray-700">Role</TableHead>
               <TableHead className="h-12 font-semibold text-gray-700">Subscription</TableHead>
               <TableHead className="h-12 font-semibold text-gray-700">Date Joined</TableHead>
-              <TableHead className="h-12 font-semibold text-gray-700">Last Active</TableHead>
-              <TableHead className="h-12 font-semibold text-gray-700 text-right pr-6">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -324,12 +262,14 @@ export default function UsersPage() {
                   <TableCell className="py-4">
                     <span
                       className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${
-                        user.subscription === "premium"
-                          ? "bg-amber-100 text-amber-700 border border-amber-200"
-                          : "bg-gray-100 text-gray-700 border border-gray-200"
+                        user.subscription === "ambis"
+                          ? "bg-purple-100 text-purple-700 border border-purple-200"
+                          : user.subscription === "setia"
+                          ? "bg-blue-100 text-blue-700 border border-blue-200"
+                          : "bg-amber-100 text-amber-700 border border-amber-200"
                       }`}
                     >
-                      {user.subscription === "premium" && <Crown className="h-3 w-3" />}
+                      {user.subscription === "ambis" && <Crown className="h-3 w-3" />}
                       {user.subscription.charAt(0).toUpperCase() + user.subscription.slice(1)}
                     </span>
                   </TableCell>
@@ -340,35 +280,11 @@ export default function UsersPage() {
                       day: 'numeric',
                     })}
                   </TableCell>
-                  <TableCell className="py-4 text-gray-500 text-sm font-medium">{user.lastActive}</TableCell>
-                  <TableCell className="py-4 text-right pr-6">
-                    <div className="flex items-center justify-end gap-2">
-                      {/* NOTE: Edit and Delete actions require backend API implementation */}
-                      <Button
-                        disabled
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-gray-300 cursor-not-allowed"
-                        title="Backend API not implemented yet"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        disabled
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-gray-300 cursor-not-allowed"
-                        title="Backend API not implemented yet"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={6} className="h-32 text-center text-gray-500">
+                <TableCell colSpan={4} className="h-32 text-center text-gray-500">
                   No users found matching your criteria.
                 </TableCell>
               </TableRow>

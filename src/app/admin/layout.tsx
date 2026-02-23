@@ -35,11 +35,6 @@ const navItems = [
     icon: "Users",
     label: "Users",
   },
-  {
-    href: "/admin/analytics",
-    icon: "BarChart",
-    label: "Analytics",
-  },
 ];
 
 export default function AdminLayout({

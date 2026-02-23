@@ -109,9 +109,9 @@ export default function EditQuestionPage() {
       setLoading(true);
       const token = localStorage.getItem('token');
       
-      // First get the question details
+      // Get question details from CMS endpoint (includes is_true for correct answers)
       const questionResponse = await fetch(
-        `${apiConfig.baseUrl}/latihan-soal/${id}`,
+        `${apiConfig.baseUrl}/latihan-soal-cms/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -123,9 +123,11 @@ export default function EditQuestionPage() {
         throw new Error("Failed to fetch question");
       }
       
-      const questionData = await questionResponse.json();
-      console.log("Question data:", questionData);
+      const response = await questionResponse.json();
+      console.log("Question data:", response);
       
+      // Backend returns { statusCode, message, data }
+      const questionData = response.data || response;
       setQuestion(questionData);
       
       // Set form data
@@ -155,7 +157,7 @@ export default function EditQuestionPage() {
         })));
       }
       
-      // Fetch topics for the subject
+      // Fetch topics for subject
       if (questionData.subject_id) {
         fetchTopics(questionData.subject_id);
       }
@@ -535,7 +537,7 @@ export default function EditQuestionPage() {
                     onClick={() => handleRemoveOption(index)}
                     disabled={options.length <= 2}
                   >
-                    <span className="text-red-500">×</span>
+                    <span className="text-red-500">&times;</span>
                   </Button>
                 </div>
               ))}
@@ -574,7 +576,7 @@ export default function EditQuestionPage() {
                     onClick={() => handleRemoveFilledAnswer(index)}
                     disabled={filledAnswers.length <= 1}
                   >
-                    <span className="text-red-500">×</span>
+                    <span className="text-red-500">&times;</span>
                   </Button>
                 </div>
               ))}

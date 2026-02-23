@@ -7,12 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TextArea } from "@/components/ui/textarea";
 import { ArrowLeft, Check, Save, Loader2 } from "lucide-react";
+import { apiConfig } from "@/redux/api/config";
+import { toast } from "react-hot-toast";
+import { v4 as uuidv4 } from "uuid";
 
 interface Subject {
   id: string;
-  code: string;
   name: string;
-  color: string;
+  color?: string;
 }
 
 interface Topic {
@@ -31,8 +33,8 @@ export default function NewQuestionPage() {
   const [formData, setFormData] = useState({
     subject_id: "",
     topic_id: "",
-    year: "",
-    difficulty: "medium",
+    year: new Date().getFullYear().toString(),
+    source: "",
     question_text: "",
     correct_answer: "",
     explanation: "",
@@ -58,32 +60,65 @@ export default function NewQuestionPage() {
 
   async function fetchSubjects() {
     try {
-      // Mock data
-      setSubjects([
-        { id: "1", code: "PU", name: "Penalaran Umum", color: "#059669" },
-        { id: "2", code: "PKPM", name: "Pengetahuan Kuantitatif", color: "#2563eb" },
-        { id: "3", code: "PPU", name: "Penalaran Pemahaman Umum", color: "#059669" },
-        { id: "4", code: "PBM", name: "Penalaran Bacaan & Menulis", color: "#d97706" },
-      ]);
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${apiConfig.baseUrl}/latihan-soal-cms/subjects`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch subjects');
+      }
+
+      const data = await response.json();
+      const subjectsArray = Array.isArray(data) ? data : (data?.data || []);
+      
+      // Add color codes to subjects
+      const colorMap: { [key: string]: string } = {
+        "Kemampuan Memahami Bacaan dan Menulis": "#dc2626",
+        "Kemampuan Penalaran Umum": "#059669",
+        "Pengetahuan Kuantitatif": "#2563eb",
+        "Penalaran Matematika": "#7c3aed",
+        "Pengetahuan dan Pemahaman Umum": "#f59e0b",
+        "Literasi dalam Bahasa Indonesia": "#0891b2",
+        "Literasi dalam Bahasa Inggris": "#ea580c",
+      };
+      
+      const subjectsWithColor = subjectsArray.map((subject: any) => ({
+        ...subject,
+        color: colorMap[subject.name] || "#6b7280"
+      }));
+      
+      setSubjects(subjectsWithColor);
     } catch (error) {
       console.error("Error fetching subjects:", error);
+      toast.error("Failed to load subjects");
     }
   }
 
   async function fetchTopics(subjectId: string) {
     try {
-      // Mock data
-      if (subjectId === "1") {
-        setTopics([
-          { id: "1", name: "Deduktif & Induktif", subject_id: "1" },
-          { id: "2", name: "Penalaran Kuantitatif", subject_id: "1" },
-          { id: "3", name: "Barisan Bilangan", subject_id: "1" },
-        ]);
-      } else {
-        setTopics([]);
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${apiConfig.baseUrl}/subjects-cms/topics`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch topics");
       }
+
+      const data = await response.json();
+      const topicsArray = Array.isArray(data) ? data : (data?.data || []);
+      
+      // Filter topics by subject
+      const filteredTopics = topicsArray.filter((topic: Topic) => topic.subject_id === subjectId);
+      setTopics(filteredTopics);
     } catch (error) {
       console.error("Error fetching topics:", error);
+      toast.error("Failed to load topics");
     }
   }
 
@@ -111,19 +146,64 @@ export default function NewQuestionPage() {
     setLoading(true);
 
     try {
+      const token = localStorage.getItem('token');
+      
+      // Find the correct answer from options
+      const correctOption = options.find(opt => opt.is_correct);
+      const correctAnswer = correctOption ? correctOption.label : "";
+      
+      // Map options to backend format
+      const backendOptions = options.map((opt, index) => ({
+        id: uuidv4(),
+        content: opt.text,
+        is_true: opt.is_correct,
+        key: opt.label
+      }));
+
+      // Prepare the payload for backend
       const payload = {
-        ...formData,
+        id: uuidv4(), // Generate new UUID for the question
+        source: formData.source || "Manual Entry", // Default source
         year: parseInt(formData.year),
-        options,
+        subject_id: formData.subject_id,
+        topic_id: formData.topic_id,
+        type: "multiple-choice", // Default type
+        published: true, // Default to published
+        question: [
+          {
+            content: formData.question_text,
+            isMedia: false
+          }
+        ],
+        answers: [
+          {
+            content: formData.explanation || `Correct answer: ${correctAnswer}`,
+            isMedia: false
+          }
+        ],
+        filled_answer: [],
+        options: backendOptions
       };
 
-      // Mock API delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log("Submitting question:", payload);
-      
+      const response = await fetch(`${apiConfig.baseUrl}/latihan-soal-cms/soal/update`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to create question");
+      }
+
+      toast.success("Question created successfully");
       router.push("/admin/questions");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating question:", error);
+      toast.error(error.message || "Failed to create question");
     } finally {
       setLoading(false);
     }
@@ -177,7 +257,7 @@ export default function NewQuestionPage() {
                 <option value="">Select a subject</option>
                 {subjects.map((subject) => (
                   <option key={subject.id} value={subject.id}>
-                    {subject.name} ({subject.code})
+                    {subject.name}
                   </option>
                 ))}
               </select>
@@ -215,23 +295,21 @@ export default function NewQuestionPage() {
                 className="border-gray-200 bg-gray-50 text-gray-900 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-emerald-500"
                 required
                 min="2000"
-                max="2024"
+                max="2030"
               />
             </div>
 
             <div>
               <label className="mb-1.5 block text-sm font-semibold text-gray-700">
-                Difficulty
+                Source
               </label>
-              <select
-                value={formData.difficulty}
-                onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })}
-                className="w-full rounded-md border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none"
-              >
-                <option value="easy">Easy</option>
-                <option value="medium">Medium</option>
-                <option value="hard">Hard</option>
-              </select>
+              <Input
+                type="text"
+                value={formData.source}
+                onChange={(e) => setFormData({ ...formData, source: e.target.value })}
+                placeholder="e.g., UTBK 2023"
+                className="border-gray-200 bg-gray-50 text-gray-900 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-emerald-500"
+              />
             </div>
           </div>
         </div>
