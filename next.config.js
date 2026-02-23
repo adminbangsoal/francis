@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  productionBrowserSourceMaps: false,
+  compress: true,
+  swcMinify: true,
   redirects: async () => {
     return [
       {

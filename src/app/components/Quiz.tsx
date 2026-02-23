@@ -4,13 +4,17 @@
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 // libs
-import { PieChart } from "@mui/x-charts/PieChart";
 import { useInView } from "framer-motion";
 import { Fragment, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 
 const RenderMarkdown = dynamic(() => import("../latihan-soal/components/RenderMarkdown"), {
   loading: () => <div className="h-20 animate-pulse bg-gray-200" />,
+});
+
+const PieChart = dynamic(() => import("@mui/x-charts/PieChart").then(mod => ({ default: mod.PieChart })), {
+  loading: () => <div className="h-40 w-40 animate-pulse bg-gray-200" />,
+  ssr: false,
 });
 
 // data
