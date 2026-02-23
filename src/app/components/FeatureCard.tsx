@@ -100,6 +100,7 @@ export default function FeatureCard({
             src={illustration}
             alt={title}
             fill
+            sizes="(max-width: 640px) 100vw, 50vw"
             className="pointer-events-none select-none object-cover"
           />
         </div>
