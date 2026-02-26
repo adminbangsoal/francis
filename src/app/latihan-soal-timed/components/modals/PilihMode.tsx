@@ -379,14 +379,14 @@ export const PilihMode = () => {
                                   setCurrentStep(2);
                                 }}
                               >
-                                <Image
+                                {/* <Image
                                   src={icon}
                                   alt={`${name} nav link icon`}
                                   width={300}
                                   height={300}
                                   quality={100}
                                   className="absolute -right-4 size-20 text-surface-400 mix-blend-multiply"
-                                />
+                                /> */}
                                 <p className="z-10 font-600 transition-colors group-hover:text-white">
                                   {name}
                                 </p>

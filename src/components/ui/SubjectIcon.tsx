@@ -2,7 +2,7 @@
 
 import { getSubjectIcon } from "@/lib/constants/subjectIcons";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 interface SubjectIconProps {
   iconUrl?: string | null;
@@ -28,36 +28,37 @@ export const SubjectIcon: React.FC<SubjectIconProps> = ({
   const [fallbackIcon, setFallbackIcon] = useState<string | null>(null);
   const instanceRef = useRef<object>({});
 
-  const isValidUrl =
-    iconUrl &&
-    (iconUrl.startsWith("http://") || iconUrl.startsWith("https://"));
+  // const isValidUrl =
+  //   iconUrl &&
+  //   (iconUrl.startsWith("http://") || iconUrl.startsWith("https://"));
   const mappedIcon = getSubjectIcon(subjectName, subjectSlug);
 
-  useEffect(() => {
-    if (!isValidUrl) {
-      setFallbackIcon(mappedIcon);
-      return;
-    }
+  // useEffect(() => {
+  //   if (!isValidUrl) {
+  //     setFallbackIcon(mappedIcon);
+  //     return;
+  //   }
 
-    if (!failedUrls.has(instanceRef.current)) {
-      failedUrls.set(instanceRef.current, new Set());
-    }
+  //   if (!failedUrls.has(instanceRef.current)) {
+  //     failedUrls.set(instanceRef.current, new Set());
+  //   }
 
-    const failedSet = failedUrls.get(instanceRef.current);
-    if (failedSet?.has(iconUrl)) {
-      setFallbackIcon(mappedIcon);
-    }
-  }, [iconUrl, isValidUrl, mappedIcon]);
+  //   const failedSet = failedUrls.get(instanceRef.current);
+  //   if (failedSet?.has(iconUrl)) {
+  //     setFallbackIcon(mappedIcon);
+  //   }
+  // }, [iconUrl, isValidUrl, mappedIcon]);
 
-  const handleImageError = () => {
-    const failedSet = failedUrls.get(instanceRef.current);
-    if (iconUrl && failedSet) {
-      failedSet.add(iconUrl);
-    }
-    setFallbackIcon(mappedIcon);
-  };
+  // const handleImageError = () => {
+  //   const failedSet = failedUrls.get(instanceRef.current);
+  //   if (iconUrl && failedSet) {
+  //     failedSet.add(iconUrl);
+  //   }
+  //   setFallbackIcon(mappedIcon);
+  // };
 
-  const src = fallbackIcon ?? iconUrl ?? mappedIcon;
+  // const src = fallbackIcon ?? iconUrl ?? mappedIcon;
+  const src = mappedIcon;
 
   return (
     <Image
@@ -66,7 +67,7 @@ export const SubjectIcon: React.FC<SubjectIconProps> = ({
       width={width}
       height={height}
       className={className}
-      onError={handleImageError}
+      // onError={handleImageError}
     />
   );
 };

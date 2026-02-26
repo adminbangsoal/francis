@@ -1,8 +1,8 @@
 import Iconify from "@/components/Iconify";
+import { SubjectIcon } from "@/components/ui/SubjectIcon";
 import { Subject } from "@/types";
 import * as Accordion from "@radix-ui/react-accordion";
 import * as Tabs from "@radix-ui/react-tabs";
-import Image from "next/image";
 import Link from "next/link";
 import MediaQuery from "react-responsive";
 import { AutoSizer, List } from "react-virtualized";
@@ -12,13 +12,15 @@ import SoalSelector from "./SoalSelector";
 
 const SubjectSkeleton = ({ isExpanded = false }: { isExpanded?: boolean }) => {
   return (
-    <div className={`group relative flex flex-col rounded-xl bg-cover ${
-      isExpanded ? "grow" : "h-11"
-    }`}>
+    <div
+      className={`group relative flex flex-col rounded-xl bg-cover ${
+        isExpanded ? "grow" : "h-11"
+      }`}
+    >
       <div className="group z-10 flex w-full items-center gap-2 rounded-xl rounded-b-none px-3 py-2 text-xl font-[650]">
         <div className="skeleton relative h-5 w-5 rounded bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
         <div className="skeleton relative h-5 w-32 rounded bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
-        <div className="skeleton relative h-5 w-5 rounded bg-surface-300 from-surface-300 via-surface-100 to-surface-300 ml-auto"></div>
+        <div className="skeleton relative ml-auto h-5 w-5 rounded bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
       </div>
       {isExpanded && (
         <div className="z-10 flex grow flex-col rounded-b-xl bg-gray-300 px-1 pb-1">
@@ -32,11 +34,7 @@ const SubjectSkeleton = ({ isExpanded = false }: { isExpanded?: boolean }) => {
             </div>
           </div>
           {/* SoalSelector Skeleton - using same layout as actual SoalSelector */}
-          <Tabs.Root
-            value="tab-1"
-            orientation="vertical"
-            className="grow"
-          >
+          <Tabs.Root value="tab-1" orientation="vertical" className="grow">
             <Tabs.List className="flex h-full w-full flex-col gap-1">
               <AutoSizer>
                 {({ height, width }) => (
@@ -46,7 +44,11 @@ const SubjectSkeleton = ({ isExpanded = false }: { isExpanded?: boolean }) => {
                     rowCount={6}
                     rowHeight={70}
                     rowRenderer={({ index, key, style }) => (
-                      <div key={key} style={style} className="flex flex-col items-center">
+                      <div
+                        key={key}
+                        style={style}
+                        className="flex flex-col items-center"
+                      >
                         <div className="skeleton relative h-[4.25rem] w-full rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
                       </div>
                     )}
@@ -113,12 +115,20 @@ const RiwayatSoalAsideDesktop = () => {
                     className="group relative flex flex-col rounded-xl bg-cover data-[state=closed]:h-11 data-[state=open]:grow data-[state=closed]:animate-slide-up-item data-[state=open]:animate-slide-down-item data-[state=closed]:overflow-hidden data-[state=open]:overflow-visible"
                   >
                     <Accordion.Trigger className="group z-10 flex w-full items-center gap-2 rounded-xl rounded-b-none px-3 py-2 text-xl font-[650] text-content-300 outline-none transition-colors duration-500 data-[state=open]:cursor-default data-[state=open]:bg-gray-300 data-[state=open]:text-surface-100 data-[state=closed]:focus-within:text-content-100 data-[state=closed]:hover:text-content-100">
-                      <Image
+                      {/* <Image
                         src={icon}
                         alt={slug}
                         width={20}
                         height={20}
                         className="w-5 text-black"
+                      /> */}
+                      <SubjectIcon
+                        iconUrl={icon}
+                        subjectName={name}
+                        subjectSlug={slug}
+                        width={20}
+                        height={20}
+                        alt={name}
                       />
                       <p className="mb-0 grow truncate text-left">
                         {alternate_name}

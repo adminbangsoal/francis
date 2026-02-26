@@ -1,4 +1,5 @@
 import Iconify from "@/components/Iconify";
+import { SubjectIcon } from "@/components/ui/SubjectIcon";
 import { cn, replaceSubjectName } from "@/lib/utils";
 import {
   useGetLatihanSoalClassicBySubjectQuery,
@@ -8,7 +9,6 @@ import {
   useUpdateTimedCurrentQuestionMutation,
 } from "@/redux/api/latihanSoalApi";
 import * as Accordion from "@radix-ui/react-accordion";
-import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import MediaQuery from "react-responsive";
@@ -159,7 +159,7 @@ export const KlasikAside = () => {
                 <div className="skeleton h-32 w-full rounded bg-surface-300 from-surface-300 via-surface-100 to-surface-300" />
               </div>
             )}
-            {subjects.map(({ alternate_name, icon }) => {
+            {subjects.map(({ alternate_name, icon, name, slug }) => {
               const subjectName = replaceSubjectName(alternate_name);
               const slugName = subjectName.toLowerCase().replace(" ", "-");
 
@@ -170,12 +170,20 @@ export const KlasikAside = () => {
                   className="group relative mb-2 flex flex-col justify-center rounded-xl bg-cover py-1 data-[state=closed]:h-11 data-[state=open]:grow data-[state=closed]:animate-slide-up-item data-[state=open]:animate-slide-down-item data-[state=closed]:overflow-hidden data-[state=open]:overflow-visible data-[state=open]:bg-[url('/bg-mesh-horizontal.webp')]"
                 >
                   <Accordion.Trigger className="group z-10 flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xl font-[650] text-content-300 outline-none transition-colors data-[state=open]:cursor-default data-[state=open]:text-surface-100 data-[state=closed]:focus-within:text-content-100 data-[state=closed]:hover:text-content-100">
-                    <Image
+                    {/* <Image
                       src={icon}
                       alt={subjectName}
                       width={20}
                       height={20}
                       className="w-5 text-black"
+                    /> */}
+                    <SubjectIcon
+                      iconUrl={icon}
+                      subjectName={name}
+                      subjectSlug={slug}
+                      width={20}
+                      height={20}
+                      alt={subjectName}
                     />
                     <p className="mb-0 grow truncate text-left">
                       {subjectName}
