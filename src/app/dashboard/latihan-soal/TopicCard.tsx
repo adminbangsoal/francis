@@ -1,13 +1,16 @@
-import { buttonVariants } from "@/components/ui/button";
+"use client";
+
 import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { buttonVariants } from "@/components/ui/button";
 import { useWindowsBreakpoints } from "@/lib/hooks/useWindowBreakpoints";
 import { AlertCircle, ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import { DashboardBoxContainer } from "../elements/DashboardBoxContainer";
 
 export const MAPEL_MAPPING: Record<
@@ -73,11 +76,9 @@ export const TopicCard = ({
   value,
 }: TopicCardI) => {
   const { isXLDesktopBreakpoint } = useWindowsBreakpoints();
+  const [imageError, setImageError] = useState(false);
   return (
-    <AccordionItem
-      value={value}
-      className="border-none"
-    >
+    <AccordionItem value={value} className="border-none">
       <DashboardBoxContainer
         variant={feedbacks.length > 0 ? "primary" : "danger"}
         className="h-fit"
@@ -86,10 +87,11 @@ export const TopicCard = ({
           <div className="flex w-full flex-col gap-2 pr-4 text-left">
             <div className="flex flex-row items-center gap-3">
               <Image
-                src={"https://bangsoal.s3.ap-southeast-1.amazonaws.com/static/pk.png"}
+                src={imageError ? "/icons/BookOpenText.svg" : subject.icon}
                 alt="icon"
                 width={20}
                 height={20}
+                onError={() => setImageError(true)}
               />
               <p className="font-medium">{subject.name}</p>
             </div>
@@ -101,7 +103,9 @@ export const TopicCard = ({
         <AccordionContent className="pt-4">
           <div className="flex flex-col gap-4">
             <div className="flex flex-row items-center gap-1 ">
-              <p className="text-nowrap text-xs">Topik yang belum kamu kuasai</p>
+              <p className="text-nowrap text-xs">
+                Topik yang belum kamu kuasai
+              </p>
               <div className="h-[0.5] w-full bg-slate-300" />
             </div>
             <div className="flex flex-col gap-1">

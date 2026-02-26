@@ -1,7 +1,10 @@
+"use client";
+
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import { useState } from "react";
 
 export interface ImageInputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -25,6 +28,7 @@ const ImageInput = React.forwardRef<HTMLInputElement, ImageInputProps>(
   ) => {
     const internalRef = React.useRef<HTMLInputElement>(null);
     const ref = forwardedRef || internalRef;
+    const [imageError, setImageError] = useState(false);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files ? e.target.files[0] : null;
@@ -37,7 +41,11 @@ const ImageInput = React.forwardRef<HTMLInputElement, ImageInputProps>(
       <div className={cn("flex flex-col items-center", className)}>
         <div className="flex flex-col justify-center gap-5">
           <Image
-            src={imageSrc ?? "/icons/User.svg"}
+            src={
+              imageError
+                ? "/icons/BookOpenText.svg"
+                : imageSrc ?? "/icons/User.svg"
+            }
             width={160}
             height={160}
             alt="Thumbnail"
@@ -45,6 +53,7 @@ const ImageInput = React.forwardRef<HTMLInputElement, ImageInputProps>(
               "h-44 w-44 shrink-0 rounded-full bg-slate-200 object-cover",
               !imageSrc && "p-6",
             )}
+            onError={() => setImageError(true)}
           />
           <div className="flex flex-row items-center justify-center divide-x divide-gray-300">
             <button

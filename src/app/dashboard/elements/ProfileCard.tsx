@@ -1,5 +1,8 @@
+"use client";
+
 import { useGetProfileDashboardQuery } from "@/redux/api/dashboardApi";
 import Image from "next/image";
+import { useState } from "react";
 
 interface ProfileCardI {
   full_name: string;
@@ -12,6 +15,7 @@ export const ProfileCard = ({
   points,
 }: ProfileCardI) => {
   const { data, isLoading } = useGetProfileDashboardQuery();
+  const [imageError, setImageError] = useState(false);
   return (
     <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-[#F8FAFC] p-4">
       <p className="text-xl font-bold">{full_name}</p>
@@ -21,12 +25,17 @@ export const ProfileCard = ({
             <div className="skeleton relative h-[40px] w-[40px] rounded-full bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
           ) : (
             <Image
-              src={data?.data.profile_picture ?? "/icons/User.svg"}
+              src={
+                imageError
+                  ? "/icons/BookOpenText.svg"
+                  : data?.data.profile_picture ?? "/icons/User.svg"
+              }
               alt="avatar"
               width={40}
               height={40}
               objectFit="cover"
               className="h-[40px] w-[40px] rounded-full object-cover"
+              onError={() => setImageError(true)}
             />
           )}
         </div>

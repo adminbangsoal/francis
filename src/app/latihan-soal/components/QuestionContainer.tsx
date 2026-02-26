@@ -1,6 +1,5 @@
 "use client";
 // components
-import Iconify from "@/components/Iconify";
 // libs
 import { cn } from "@/lib/utils";
 import {
@@ -40,7 +39,7 @@ const PembahasanContainer = dynamic(() => import("./PembahasanContainer"), {
   ssr: false,
   loading: () => (
     <div className="relative mb-10 rounded-xl border-2 border-gray-200 px-6 pb-10 pt-4">
-      <div className="skeleton relative h-4 w-24 rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300 mb-4"></div>
+      <div className="skeleton relative mb-4 h-4 w-24 rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
       <div className="skeleton relative h-32 w-full rounded-lg bg-surface-300 from-surface-300 via-surface-100 to-surface-300"></div>
     </div>
   ),
@@ -65,6 +64,9 @@ export const QuestionContainer = ({ slug }: QuestionContainerI) => {
   const [hasAttempted, setHasAttempted] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [localChoice, setLocalChoice] = useState<string[]>([]); // Track user's local selection
+  const [mediaImageErrors, setMediaImageErrors] = useState<
+    Record<string, boolean>
+  >({});
 
   const [disableChoice, setDisableChoice] = useState<boolean>(false);
   const { selectedTopicId, subjects, yearRange, selectedSubject, soalData } =
@@ -110,7 +112,8 @@ export const QuestionContainer = ({ slug }: QuestionContainerI) => {
     }
   }, [isSuccess]);
 
-  const [attemptSoal, { isLoading: isAttempting }] = useAttemptLatihanSoalMutation();
+  const [attemptSoal, { isLoading: isAttempting }] =
+    useAttemptLatihanSoalMutation();
 
   const onClickOption = (
     choice_id: string | null,
@@ -126,10 +129,10 @@ export const QuestionContainer = ({ slug }: QuestionContainerI) => {
         setLocalChoice([...choiceIds]);
         setChoice([...choiceIds]);
       }
-      
+
       // Immediately set hasAttempted for instant button state update
       setHasAttempted(true);
-      
+
       // Fire and forget - don't await to make UI more responsive
       switch (question.type) {
         case "multiple-answer":
@@ -154,29 +157,43 @@ export const QuestionContainer = ({ slug }: QuestionContainerI) => {
   useEffect(() => {
     if (attemptQuestionData?.data) {
       const questionType = attemptQuestionData?.data.type;
-      const serverChoice = questionType === "multiple-choice" 
-        ? (attemptQuestionData?.data?.choice_id ? [attemptQuestionData?.data?.choice_id] : [])
-        : (attemptQuestionData?.data.filledAnswers || []);
+      const serverChoice =
+        questionType === "multiple-choice"
+          ? attemptQuestionData?.data?.choice_id
+            ? [attemptQuestionData?.data?.choice_id]
+            : []
+          : attemptQuestionData?.data.filledAnswers || [];
 
       // Only update choice from server if:
       // 1. The question was already submitted (pembahasan state) - always trust server
       // 2. User hasn't made a local selection (localChoice is empty)
       // 3. Server has valid data and we're not currently attempting (to avoid race condition)
-      const shouldUpdateFromServer = 
-        attemptQuestionData?.data?.submitted || 
-        (localChoice.length === 0 && serverChoice.length > 0 && !isAttempting) ||
-        (serverChoice.length > 0 && !isAttempting && JSON.stringify(serverChoice) !== JSON.stringify(localChoice) && attemptQuestionData?.data?.timestamp);
+      const shouldUpdateFromServer =
+        attemptQuestionData?.data?.submitted ||
+        (localChoice.length === 0 &&
+          serverChoice.length > 0 &&
+          !isAttempting) ||
+        (serverChoice.length > 0 &&
+          !isAttempting &&
+          JSON.stringify(serverChoice) !== JSON.stringify(localChoice) &&
+          attemptQuestionData?.data?.timestamp);
 
       if (shouldUpdateFromServer) {
-        if (questionType === "multiple-choice" && attemptQuestionData?.data?.choice_id) {
+        if (
+          questionType === "multiple-choice" &&
+          attemptQuestionData?.data?.choice_id
+        ) {
           setChoice([attemptQuestionData?.data?.choice_id]);
           setLocalChoice([attemptQuestionData?.data?.choice_id]);
-        } else if (questionType === "multiple-answer" && attemptQuestionData?.data.filledAnswers?.length > 0) {
+        } else if (
+          questionType === "multiple-answer" &&
+          attemptQuestionData?.data.filledAnswers?.length > 0
+        ) {
           setChoice([...attemptQuestionData?.data.filledAnswers]);
           setLocalChoice([...attemptQuestionData?.data.filledAnswers]);
         }
       }
-      
+
       // Update hasAttempted state when attempt data is available
       if (attemptQuestionData.data && !attemptQuestionData.data.submitted) {
         setHasAttempted(true);
@@ -309,10 +326,17 @@ export const QuestionContainer = ({ slug }: QuestionContainerI) => {
             ) : (
               <Image
                 key={content}
-                src={content}
+                src={
+                  mediaImageErrors[content]
+                    ? "/icons/BookOpenText.svg"
+                    : content
+                }
                 alt="asset image"
                 width={500}
                 height={300}
+                onError={() =>
+                  setMediaImageErrors((prev) => ({ ...prev, [content]: true }))
+                }
               />
             );
           })}
@@ -416,7 +440,9 @@ export const QuestionContainer = ({ slug }: QuestionContainerI) => {
             data={attemptQuestionData}
             disableCekJawaban={
               pembahasanFetched ||
-              (!hasAttempted && !attemptQuestionData?.data && question?.type !== "fill-in")
+              (!hasAttempted &&
+                !attemptQuestionData?.data &&
+                question?.type !== "fill-in")
             }
           />
         )}

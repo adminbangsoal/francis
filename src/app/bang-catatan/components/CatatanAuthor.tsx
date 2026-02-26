@@ -1,7 +1,10 @@
+"use client";
+
 import { colorMapping } from "@/data/bang-catatan";
 import { cn } from "@/lib/utils";
 import { BangCatatanTheme } from "@/types/catatan";
 import Image from "next/image";
+import { useState } from "react";
 
 interface CatatanAuthorI {
   color_pallete: BangCatatanTheme;
@@ -16,6 +19,8 @@ const CatatanAuthor = ({
   author_picture,
   author,
 }: CatatanAuthorI) => {
+  const [imageError, setImageError] = useState(false);
+
   return (
     <div className="flex grow flex-col gap-1">
       <p
@@ -28,11 +33,12 @@ const CatatanAuthor = ({
       </p>
       <div className="flex items-center gap-1">
         <Image
-          src={author_picture}
+          src={imageError ? "/icons/BookOpenText.svg" : author_picture}
           alt="Catatan avatar"
           width={800}
           height={800}
           className="size-4 rounded-full"
+          onError={() => setImageError(true)}
         />
         <p
           className={cn("text-sm font-500", colorMapping[color_pallete].author)}

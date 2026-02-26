@@ -1,6 +1,9 @@
+"use client";
+
 import { cn } from "@/lib/utils";
 import { MathpixLoader, MathpixMarkdown } from "mathpix-markdown-it";
 import Image from "next/image";
+import { useState } from "react";
 
 const RenderMarkdown = ({
   markdown,
@@ -13,11 +16,19 @@ const RenderMarkdown = ({
   id?: string;
   asset?: string;
 }) => {
+  const [imageError, setImageError] = useState(false);
+
   return (
     <>
       <div className="flex justify-center">
         {asset && (
-          <Image src={asset} alt="asset image" width={500} height={300} />
+          <Image
+            src={imageError ? "/icons/BookOpenText.svg" : asset}
+            alt="asset image"
+            width={500}
+            height={300}
+            onError={() => setImageError(true)}
+          />
         )}
       </div>
       {markdown && (

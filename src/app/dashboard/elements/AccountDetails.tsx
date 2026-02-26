@@ -32,6 +32,7 @@ export const AccountDetails = () => {
   const router = useRouter();
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
+  const [profileImageError, setProfileImageError] = useState<boolean>(false);
 
   const { data: profileData } = useGetProfileDashboardQuery();
 
@@ -135,7 +136,11 @@ export const AccountDetails = () => {
         <div className="flex flex-col items-center">
           {/* image field */}
           <Image
-            src={profilePicture ?? "/icons/User.svg"}
+            src={
+              profileImageError
+                ? "/icons/BookOpenText.svg"
+                : profilePicture ?? "/icons/User.svg"
+            }
             width={160}
             height={160}
             alt="Thumbnail"
@@ -143,6 +148,7 @@ export const AccountDetails = () => {
               "h-44 w-44 shrink-0 rounded-full bg-slate-200 object-cover",
               !profilePicture && "p-6",
             )}
+            onError={() => setProfileImageError(true)}
           />
           {isEdit && (
             <div className="mt-4 flex flex-row items-center justify-center divide-x divide-gray-300 md:col-span-1">

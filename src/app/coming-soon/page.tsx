@@ -1,7 +1,7 @@
 "use client";
 // components
-import { ContextMenu, ContextMenuTrigger } from "@/components/ui/context-menu";
 import Iconify from "@/components/Iconify";
+import { ContextMenu, ContextMenuTrigger } from "@/components/ui/context-menu";
 
 // libs
 import dayjs from "dayjs";
@@ -29,6 +29,7 @@ export default function ComingSoon() {
     minutes: 0,
     seconds: 0,
   });
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     const calculateCountdown = () => {
@@ -77,7 +78,7 @@ export default function ComingSoon() {
     <>
       <button
         onClick={() => router.back()}
-        className="fixed left-5 top-5 z-[100] flex items-center gap-2 rounded-full bg-white/95 px-4 py-2.5 text-sm font-600 text-content-200 shadow-xl backdrop-blur-sm transition-all hover:bg-white hover:scale-105 border border-emerald-200/50 sm:left-10 sm:top-10"
+        className="fixed left-5 top-5 z-[100] flex items-center gap-2 rounded-full border border-emerald-200/50 bg-white/95 px-4 py-2.5 text-sm font-600 text-content-200 shadow-xl backdrop-blur-sm transition-all hover:scale-105 hover:bg-white sm:left-10 sm:top-10"
         aria-label="Kembali"
       >
         <Iconify icon="ph:arrow-left-bold" className="text-lg" />
@@ -86,69 +87,74 @@ export default function ComingSoon() {
       <ContextMenu>
         <ContextMenuTrigger className="fixed inset-0 z-50 flex h-screen flex-col items-center justify-center bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 px-5 backdrop-blur-2xl sm:px-10">
           <div className="flex flex-col items-center gap-6 sm:gap-8">
-          <Image
-            src="https://bangsoal.s3.ap-southeast-1.amazonaws.com/static/empty-state-under-construction.svg"
-            alt="Coming Soon"
-            width={400}
-            height={260}
-            loading="eager"
-            className="w-64 sm:w-80"
-            unoptimized
-          />
+            <Image
+              src={
+                imageError
+                  ? "/icons/BookOpenText.svg"
+                  : "https://bangsoal.s3.ap-southeast-1.amazonaws.com/static/empty-state-under-construction.svg"
+              }
+              alt="Coming Soon"
+              width={400}
+              height={260}
+              loading="eager"
+              className="w-64 sm:w-80"
+              unoptimized
+              onError={() => setImageError(true)}
+            />
 
-          <div className="flex flex-col items-center gap-3 py-5">
-            <h1 className="text-center text-3xl font-bold sm:text-4xl md:text-5xl">
-              Coming Soon! 🚀
-            </h1>
-            <p className="max-w-lg text-balance text-center text-sm text-content-300 sm:text-base">
-              Website BangSoal akan segera hadir dengan fitur-fitur terbaru yang
-              lebih keren! Tunggu tanggal mainnya ya, bang! 💪
-            </p>
-          </div>
+            <div className="flex flex-col items-center gap-3 py-5">
+              <h1 className="text-center text-3xl font-bold sm:text-4xl md:text-5xl">
+                Coming Soon! 🚀
+              </h1>
+              <p className="max-w-lg text-balance text-center text-sm text-content-300 sm:text-base">
+                Website BangSoal akan segera hadir dengan fitur-fitur terbaru
+                yang lebih keren! Tunggu tanggal mainnya ya, bang! 💪
+              </p>
+            </div>
 
-          <div className="flex flex-col items-center gap-4">
-            <p className="text-content-400 text-center text-sm font-semibold sm:text-base">
-              Launch Date: {TARGET_DATE.format("DD MMMM YYYY")}
-            </p>
+            <div className="flex flex-col items-center gap-4">
+              <p className="text-content-400 text-center text-sm font-semibold sm:text-base">
+                Launch Date: {TARGET_DATE.format("DD MMMM YYYY")}
+              </p>
 
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
-              <CountdownCard label="Hari" value={countdown.days} />
-              <CountdownCard label="Jam" value={countdown.hours} />
-              <CountdownCard label="Menit" value={countdown.minutes} />
-              <CountdownCard label="Detik" value={countdown.seconds} />
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+                <CountdownCard label="Hari" value={countdown.days} />
+                <CountdownCard label="Jam" value={countdown.hours} />
+                <CountdownCard label="Menit" value={countdown.minutes} />
+                <CountdownCard label="Detik" value={countdown.seconds} />
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Animated scrolling text at top */}
-        <div className="absolute top-1 -rotate-6 bg-[url('/bg-mesh-horizontal.webp')] bg-cover bg-center shadow-md">
-          <div className="flex animate-infinite-track">
-            {[...Array(20)].map((e, i) => (
-              <p
-                key={i}
-                className="w-40 shrink-0 py-1 text-center text-sm font-600 text-white/70"
-              >
-                coming soon
-              </p>
-            ))}
+          {/* Animated scrolling text at top */}
+          <div className="absolute top-1 -rotate-6 bg-[url('/bg-mesh-horizontal.webp')] bg-cover bg-center shadow-md">
+            <div className="flex animate-infinite-track">
+              {[...Array(20)].map((e, i) => (
+                <p
+                  key={i}
+                  className="w-40 shrink-0 py-1 text-center text-sm font-600 text-white/70"
+                >
+                  coming soon
+                </p>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Animated scrolling text at bottom */}
-        <div className="absolute bottom-0 rotate-3 bg-[url('/bg-mesh-horizontal.webp')] bg-cover bg-center shadow-md">
-          <div className="flex animate-infinite-track">
-            {[...Array(20)].map((e, i) => (
-              <p
-                key={i}
-                className="w-40 shrink-0 py-1 text-center text-sm font-600 text-white/70"
-              >
-                coming soon
-              </p>
-            ))}
+          {/* Animated scrolling text at bottom */}
+          <div className="absolute bottom-0 rotate-3 bg-[url('/bg-mesh-horizontal.webp')] bg-cover bg-center shadow-md">
+            <div className="flex animate-infinite-track">
+              {[...Array(20)].map((e, i) => (
+                <p
+                  key={i}
+                  className="w-40 shrink-0 py-1 text-center text-sm font-600 text-white/70"
+                >
+                  coming soon
+                </p>
+              ))}
+            </div>
           </div>
-        </div>
-      </ContextMenuTrigger>
-    </ContextMenu>
+        </ContextMenuTrigger>
+      </ContextMenu>
     </>
   );
 }
