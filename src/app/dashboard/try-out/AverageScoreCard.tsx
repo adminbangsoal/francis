@@ -1,8 +1,7 @@
 "use client";
 
+import { SubjectIcon } from "@/components/ui/SubjectIcon";
 import { Subject } from "@/types";
-import Image from "next/image";
-import { useState } from "react";
 import { DashboardBoxContainer } from "../elements/DashboardBoxContainer";
 import { FeedbackSoal } from "../latihan-soal/TopicCard";
 interface AverageScoreCardI {
@@ -21,19 +20,17 @@ export const AverageScoreCard = ({
   feedbacks,
   isLowest = false,
 }: AverageScoreCardI) => {
-  const [imageError, setImageError] = useState(false);
-
   return (
     <DashboardBoxContainer variant={isLowest ? "danger" : "primary"}>
       <div className="grid grid-cols-3 items-center md:items-start">
         <div className="mr-2 flex flex-col border-r border-gray-300 pr-2">
           <div className="flex flex-row items-center gap-3">
-            <Image
-              src={imageError ? "/icons/BookOpenText.svg" : subject.icon}
-              alt={subject.name}
+            <SubjectIcon
+              iconUrl={subject.icon}
+              subjectName={subject.name}
               width={28}
               height={28}
-              onError={() => setImageError(true)}
+              alt={subject.name}
             />
             <p>{subject.name}</p>
           </div>

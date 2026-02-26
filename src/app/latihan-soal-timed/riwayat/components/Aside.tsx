@@ -1,5 +1,6 @@
 "use client";
 
+import { SubjectIcon } from "@/components/ui/SubjectIcon";
 import {
   Accordion,
   AccordionContent,
@@ -12,7 +13,6 @@ import {
   useGetSubjectsQuery,
 } from "@/redux/api/latihanSoalApi";
 import { Subject } from "@/types";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import MediaQuery from "react-responsive";
 import { LatihanAsideContainer } from "../../components/Aside/LatihanAsideContainer";
@@ -135,14 +135,14 @@ const RiwayatTimedSoalAsideContainer = ({
                               )}
                             >
                               <div className="flex items-center gap-x-2">
-                                <div className="h-[24px] w-[24px]">
-                                  <Image
-                                    src={subject.icon}
-                                    alt="subject icon"
-                                    width={24}
-                                    height={24}
-                                  />
-                                </div>
+                                <SubjectIcon
+                                  iconUrl={subject.icon}
+                                  subjectName={subject.name}
+                                  subjectSlug={subject.slug}
+                                  width={24}
+                                  height={24}
+                                  alt={subject.alternate_name}
+                                />
                                 <h6 className="text-base font-700 text-[#6B7280]">
                                   {subject.alternate_name}
                                 </h6>

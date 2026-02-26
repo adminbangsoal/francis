@@ -3,6 +3,7 @@ import bgMeshVertical from "@public/bg-mesh-vertical.webp";
 
 // components
 import Iconify from "@/components/Iconify";
+import { SubjectIcon } from "@/components/ui/SubjectIcon";
 
 import { SelectedSubjectType, Subject } from "@/types";
 import * as Accordion from "@radix-ui/react-accordion";
@@ -74,12 +75,13 @@ const SoalAsideDesktop = ({ subject }: SoalAsideProps) => {
                       className="group relative flex flex-col rounded-xl bg-cover data-[state=closed]:h-11 data-[state=open]:grow data-[state=closed]:animate-slide-up-item data-[state=open]:animate-slide-down-item data-[state=closed]:overflow-hidden data-[state=open]:overflow-visible"
                     >
                       <Accordion.Trigger className="group z-10 flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xl font-[650] text-content-300 outline-none transition-colors data-[state=open]:cursor-default data-[state=open]:text-surface-100 data-[state=closed]:focus-within:text-content-100 data-[state=closed]:hover:text-content-100">
-                        <Image
-                          src={icon}
-                          alt={name}
+                        <SubjectIcon
+                          iconUrl={icon}
+                          subjectName={name}
+                          subjectSlug={slug}
                           width={20}
                           height={20}
-                          className="w-5 text-black"
+                          alt={name}
                         />
                         <p className="mb-0 grow truncate text-left">
                           {alternate_name}

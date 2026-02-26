@@ -1,5 +1,6 @@
 "use client";
 
+import { SubjectIcon } from "@/components/ui/SubjectIcon";
 import {
   AccordionContent,
   AccordionItem,
@@ -8,9 +9,7 @@ import {
 import { buttonVariants } from "@/components/ui/button";
 import { useWindowsBreakpoints } from "@/lib/hooks/useWindowBreakpoints";
 import { AlertCircle, ArrowRight } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
 import { DashboardBoxContainer } from "../elements/DashboardBoxContainer";
 
 export const MAPEL_MAPPING: Record<
@@ -76,7 +75,6 @@ export const TopicCard = ({
   value,
 }: TopicCardI) => {
   const { isXLDesktopBreakpoint } = useWindowsBreakpoints();
-  const [imageError, setImageError] = useState(false);
   return (
     <AccordionItem value={value} className="border-none">
       <DashboardBoxContainer
@@ -86,12 +84,13 @@ export const TopicCard = ({
         <AccordionTrigger className="w-full hover:no-underline [&>svg]:shrink-0">
           <div className="flex w-full flex-col gap-2 pr-4 text-left">
             <div className="flex flex-row items-center gap-3">
-              <Image
-                src={imageError ? "/icons/BookOpenText.svg" : subject.icon}
-                alt="icon"
+              <SubjectIcon
+                iconUrl={subject.icon}
+                subjectName={subject.name}
+                subjectSlug={subject.slug}
                 width={20}
                 height={20}
-                onError={() => setImageError(true)}
+                alt={subject.name}
               />
               <p className="font-medium">{subject.name}</p>
             </div>
