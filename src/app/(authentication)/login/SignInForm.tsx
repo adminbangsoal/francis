@@ -42,27 +42,54 @@ export const SignInForm = ({
   ] = useGoogleSignInMutation();
 
   const handleGoogleSignIn = async () => {
+    console.log('[Frontend] Starting Google Sign In...');
+    
     try {
       // Check if Firebase config is available
       if (!process.env.NEXT_PUBLIC_FIREBASE_API_KEY) {
+        console.error('[Frontend] Firebase not configured');
         toast.error(
           "Firebase belum dikonfigurasi. Silakan set environment variables.",
         );
         return;
       }
 
+      console.log('[Frontend] Firebase config found, opening popup...');
+      
       // Sign in with Google using Firebase
       const result = await signInWithPopup(auth, googleProvider);
+      console.log('[Frontend] Firebase sign in successful, getting ID token...');
+      
       const idToken = await result.user.getIdToken();
+      console.log('[Frontend] ID token obtained, sending to backend...');
 
       // Send ID token to backend
       await googleSignIn({ idToken });
+      
+      console.log('[Frontend] Google Sign In completed successfully');
     } catch (error: any) {
-      console.error("Google Sign In error:", error);
+      console.error("[Frontend] Google Sign In error:", error);
+      console.error("[Frontend] Error code:", error.code);
+      console.error("[Frontend] Error message:", error.message);
+      console.error("[Frontend] Error data:", error.data);
+      console.error("[Frontend] Full error:", JSON.stringify(error, null, 2));
+      
       if (error.code === "auth/popup-closed-by-user") {
         toast.error("Popup ditutup. Silakan coba lagi.");
       } else if (error.code === "auth/popup-blocked") {
         toast.error("Popup diblokir. Silakan izinkan popup untuk domain ini.");
+      } else if (error.code === "auth/unauthorized-domain") {
+        toast.error("Domain tidak terdaftar di Firebase. Hubungi administrator.");
+        console.error('[Frontend] Unauthorized domain. Current domain:', window.location.hostname);
+      } else if (error.code === "auth/cancelled-popup-request") {
+        toast.error("Permintaan dibatalkan. Silakan coba lagi.");
+      } else if (error?.error?.data?.message) {
+        // Backend error response
+        console.error('[Frontend] Backend error:', error.error.data.message);
+        toast.error(`Error: ${error.error.data.message}`);
+      } else if (error?.data?.message) {
+        console.error('[Frontend] API error:', error.data.message);
+        toast.error(`Error: ${error.data.message}`);
       } else {
         toast.error(
           `Google Sign In gagal: ${error.message || "Terjadi kesalahan"}`,

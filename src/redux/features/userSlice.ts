@@ -2,6 +2,7 @@ import { ProfileResponse, SigninResponse, SignupResponse, User } from "@/types";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import storage from "redux-persist/lib/storage";
 import { authApi } from "../api/authApi";
+import { getRedirectPath } from "@/lib/userUtils";
 
 interface UserSliceState {
   token: string | null;
@@ -27,7 +28,7 @@ const userSlice = createSlice({
     updateProfile: (state, { payload }: PayloadAction<User>) => {
       state.profile = payload;
       if (window.location.pathname === "/onboarding") {
-        window.location.pathname = "/dashboard";
+        window.location.pathname = getRedirectPath(payload);
       }
     },
   },
@@ -42,16 +43,16 @@ const userSlice = createSlice({
           profile_img: payload.data.user.profile_picture || "",
         };
         // Email is already in state.profile.email, no need for cookies
-        // Ensure token is saved to localStorage
-        if (typeof window !== "undefined") {
-          window.localStorage.setItem("token", token);
-          // State will be persisted by redux-persist
-          if (!payload.data.user.onboard_date) {
-            window.location.pathname = "/onboarding";
-          } else {
-            window.location.pathname = "/dashboard";
+          // Ensure token is saved to localStorage
+          if (typeof window !== "undefined") {
+            window.localStorage.setItem("token", token);
+            // State will be persisted by redux-persist
+            if (!payload.data.user.onboard_date) {
+              window.location.pathname = "/onboarding";
+            } else {
+              window.location.pathname = getRedirectPath(payload.data.user);
+            }
           }
-        }
       },
     );
     builder.addMatcher(
@@ -71,7 +72,7 @@ const userSlice = createSlice({
           if (!payload.data.user.onboard_date) {
             window.location.pathname = "/onboarding";
           } else {
-            window.location.pathname = "/dashboard";
+            window.location.pathname = getRedirectPath(payload.data.user);
           }
         }
       },

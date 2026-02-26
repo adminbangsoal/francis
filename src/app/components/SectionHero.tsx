@@ -58,7 +58,8 @@ export default function Hero() {
               height={48}
               loading="eager"
               priority
-              className="absolute -inset-x-4 -bottom-8 h-auto w-auto"
+              style={{ width: "auto", height: "auto" }}
+              className="absolute -inset-x-4 -bottom-8"
             />
           </span>
         </h1>

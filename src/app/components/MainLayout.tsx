@@ -23,18 +23,22 @@ dayjs.locale("id");
 
 export const MainLayout = ({ children }: MainLayoutI) => {
   const pathname = usePathname();
+  const isAdminPath = pathname?.startsWith("/admin");
+  
   const hideNav =
     LATSOL_PATH.test(pathname) ||
     LATSOL_NEW_PATH.test(pathname) ||
     TRY_OUT_PATH.test(pathname) ||
     AUTH_PATHS.includes(pathname) ||
     LATIHAN_HISTORY_PATH.includes(pathname) ||
-    DASHBOARD_PATH.includes(pathname);
+    DASHBOARD_PATH.includes(pathname) ||
+    isAdminPath;
 
   const hideFooter =
     "/latihan-soal-timed" === pathname ||
     CATATAN_PATH.test(pathname) ||
-    CATATAN_BASE_PATH === pathname;
+    CATATAN_BASE_PATH === pathname ||
+    isAdminPath;
 
   // Coming soon redirect disabled - all paths are accessible
 

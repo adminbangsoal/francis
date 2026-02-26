@@ -1,7 +1,14 @@
 import type { NextFetchEvent, NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-// Function to check backend server availability
+// List of admin emails that should be redirected to admin dashboard
+const ADMIN_EMAILS = [
+  'alisyageza24@gmail.com',
+  'admin@bangsoal.co.id',
+  'joseph.srgh@gmail.com'
+];
+
+// Function to redirect when the backend is unavailable
 async function checkBackendServerAvailability() {
   try {
     const response = await fetch(`${process.env.API_URL}/api/health`, {
@@ -20,28 +27,40 @@ export default async function middleware(
 ) {
   const { pathname } = request.nextUrl;
 
-  // Exclude static assets, API routes, and Next.js internal routes from maintenance check
-  const shouldSkip = 
-    pathname.startsWith("/_next") ||
-    pathname.startsWith("/api") ||
-    pathname.startsWith("/static") ||
-    pathname.startsWith("/images") ||
-    pathname.includes(".") || // Files with extensions (favicon.ico, etc.)
-    pathname === "/maintenance";
-
-  if (shouldSkip) {
+  // Skip admin paths - let them pass through
+  if (pathname.startsWith('/admin')) {
     return NextResponse.next();
   }
 
-  // Check backend availability
-  const isBackendAvailable = await checkBackendServerAvailability();
+  // Check if user has admin token in cookies
+  const adminToken = request.cookies.get('admin_token');
+  const userToken = request.cookies.get('token');
+  
+  if (adminToken || userToken) {
+    try {
+      // Get user info from API to check if admin
+      const response = await fetch(`${process.env.API_URL}/auth/me`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${userToken?.value || adminToken?.value}`,
+          'Content-Type': 'application/json',
+        },
+      });
 
-  // If backend is down, redirect to maintenance page for ALL paths
-  if (!isBackendAvailable) {
-    const maintenanceUrl = new URL("/maintenance", request.url);
-    return NextResponse.redirect(maintenanceUrl);
+      if (response.ok) {
+        const data = await response.json();
+        const userEmail = data.data?.user?.email;
+        
+        // If user is admin and not already on admin page, redirect to admin
+        if (ADMIN_EMAILS.includes(userEmail) && !pathname.startsWith('/admin')) {
+          return NextResponse.redirect(new URL('/admin', request.url));
+        }
+      }
+    } catch (error) {
+      console.error('Error checking admin status:', error);
+    }
   }
 
-  // Backend is available, proceed normally
+  // Allow all other paths
   return NextResponse.next();
 }

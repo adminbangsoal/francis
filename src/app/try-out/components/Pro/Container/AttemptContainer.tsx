@@ -1,5 +1,5 @@
 "use client";
-import RenderMarkdown from "@/app/latihan-soal/components/RenderMarkdown";
+import dynamic from "next/dynamic";
 import { OptionBoxVariants } from "@/app/latihan-soal/components/style";
 import { useTryoutContextV2 } from "@/app/try-out/context/TryoutContextV2";
 import { cn } from "@/lib/utils";
@@ -23,6 +23,10 @@ import FinishedTryoutModal from "../FinishedTOModal";
 import NextSetModal from "../NextSetModal";
 import SoalTrackerMobile from "../SoalTrackerMobile";
 import SubmitTOModal from "../SubmitTOModal";
+
+const RenderMarkdown = dynamic(() => import("@/app/latihan-soal/components/RenderMarkdown"), {
+  loading: () => <div className="h-20 animate-pulse bg-gray-200" />,
+});
 
 interface TOProAttemptContainerProps {
   setId: string;

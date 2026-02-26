@@ -18,7 +18,6 @@ import { useOnboardingMutation } from "@/redux/api/usersApi";
 import { onboardingFormSchema } from "@/types/schema/auth";
 import { useState } from "react";
 
-import withAuth from "@/app/components/withAuth";
 import SearchableDropdown from "@/components/ui/searchable-dropdown";
 import { updateProfile } from "@/redux/features/userSlice";
 import { useAppSelector } from "@/redux/store";
@@ -26,9 +25,22 @@ import { PTN } from "@/types";
 import { redirect } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { PTNChoices } from "../login/interface";
+import { getRedirectPath, isAdminUser } from "@/lib/userUtils";
+import { useGetProfileQuery } from "@/redux/api/authApi";
 
 const Onboarding = () => {
   const user = useAppSelector((state) => state.user);
+
+  useGetProfileQuery(undefined, {
+    skip: !!user.profile,
+  });
+
+  // Early redirect for admins - do this before any rendering
+  useEffect(() => {
+    if (user.profile && isAdminUser(user.profile)) {
+      redirect('/admin');
+    }
+  }, [user.profile]);
 
   const form = useForm<z.infer<typeof onboardingFormSchema>>({
     resolver: zodResolver(onboardingFormSchema),
@@ -116,8 +128,8 @@ const Onboarding = () => {
   }, [isSuccess]);
 
   useEffect(() => {
-    if (user.profile?.onboard_date) redirect("/dashboard");
-  }, [user.profile?.onboard_date]);
+    if (user.profile?.onboard_date) redirect(getRedirectPath(user.profile));
+  }, [user.profile]);
 
   return (
     <div className="mx-0 flex h-full items-center justify-center gap-10 pt-10 lg:mx-16">
@@ -269,14 +281,14 @@ const Onboarding = () => {
                                   &#40;Pilihan Utama&#41;
                                 </span>
                               </FormLabel>
-                              <SearchableDropdown
-                                {...field}
-                                triggerValidation={trigger}
-                                setValue={setValue}
-                                options={selectedPTN.one?.prodi ?? []}
-                                placeholder="Pilih Prodi"
-                                error={fieldState.error}
-                              />
+                            <SearchableDropdown
+                              {...field}
+                              triggerValidation={trigger}
+                              setValue={setValue}
+                              options={selectedPTN.one?.prodi ?? []}
+                              placeholder="Pilih Prodi"
+                              error={fieldState.error}
+                            />
                             </>
 
                             <FormMessage />
@@ -300,14 +312,14 @@ const Onboarding = () => {
                                   &#40;Pilihan Kedua&#41;
                                 </span>
                               </FormLabel>
-                              <SearchableDropdown
-                                {...field}
-                                triggerValidation={trigger}
-                                setValue={setValue}
-                                options={ptnOptions}
-                                placeholder="Pilih PTN"
-                                error={fieldState.error}
-                              />
+                            <SearchableDropdown
+                              {...field}
+                              triggerValidation={trigger}
+                              setValue={setValue}
+                              options={ptnOptions}
+                              placeholder="Pilih PTN"
+                              error={fieldState.error}
+                            />
                             </>
 
                             <FormMessage />
@@ -331,14 +343,14 @@ const Onboarding = () => {
                                   &#40;Pilihan Kedua&#41;
                                 </span>
                               </FormLabel>
-                              <SearchableDropdown
-                                {...field}
-                                triggerValidation={trigger}
-                                setValue={setValue}
-                                options={selectedPTN.two?.prodi ?? []}
-                                placeholder="Pilih Prodi"
-                                error={fieldState.error}
-                              />
+                            <SearchableDropdown
+                              {...field}
+                              triggerValidation={trigger}
+                              setValue={setValue}
+                              options={selectedPTN.two?.prodi ?? []}
+                              placeholder="Pilih Prodi"
+                              error={fieldState.error}
+                            />
                             </>
 
                             <FormMessage />
@@ -362,14 +374,14 @@ const Onboarding = () => {
                                   &#40;Pilihan Ketiga&#41;
                                 </span>
                               </FormLabel>
-                              <SearchableDropdown
-                                {...field}
-                                triggerValidation={trigger}
-                                setValue={setValue}
-                                options={ptnOptions}
-                                placeholder="Pilih PTN"
-                                error={fieldState.error}
-                              />
+                            <SearchableDropdown
+                              {...field}
+                              triggerValidation={trigger}
+                              setValue={setValue}
+                              options={ptnOptions}
+                              placeholder="Pilih PTN"
+                              error={fieldState.error}
+                            />
                             </>
 
                             <FormMessage />
@@ -393,14 +405,14 @@ const Onboarding = () => {
                                   &#40;Pilihan Ketiga&#41;
                                 </span>
                               </FormLabel>
-                              <SearchableDropdown
-                                {...field}
-                                triggerValidation={trigger}
-                                setValue={setValue}
-                                options={selectedPTN.three?.prodi ?? []}
-                                placeholder="Pilih Prodi"
-                                error={fieldState.error}
-                              />
+                            <SearchableDropdown
+                              {...field}
+                              triggerValidation={trigger}
+                              setValue={setValue}
+                              options={selectedPTN.three?.prodi ?? []}
+                              placeholder="Pilih Prodi"
+                              error={fieldState.error}
+                            />
                             </>
 
                             <FormMessage />
@@ -429,4 +441,4 @@ const Onboarding = () => {
   );
 };
 
-export default withAuth(Onboarding);
+export default Onboarding;

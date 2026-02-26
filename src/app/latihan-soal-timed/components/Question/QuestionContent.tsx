@@ -1,5 +1,5 @@
 "use client";
-import RenderMarkdown from "@/app/latihan-soal/components/RenderMarkdown";
+import dynamic from "next/dynamic";
 import { OptionBoxVariants } from "@/app/latihan-soal/components/style";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
@@ -9,6 +9,10 @@ import { useEffect, useState } from "react";
 import MediaQuery from "react-responsive";
 import { useLatihanContext } from "../../context/LatihanContext";
 import { HasilLatianCard } from "../modals/HasilLatian";
+
+const RenderMarkdown = dynamic(() => import("@/app/latihan-soal/components/RenderMarkdown"), {
+  loading: () => <div className="h-20 animate-pulse bg-gray-200" />,
+});
 
 interface QuestionContentI {
   content: Content[];
