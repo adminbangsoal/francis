@@ -7,16 +7,7 @@ import Image from "next/image";
 export default function Maintenance() {
   return (
     <ContextMenu>
-      <ContextMenuTrigger className="fixed inset-0 z-50 flex h-screen flex-col items-center justify-center bg-surface-100/70 px-5 backdrop-blur-2xl sm:px-10">
-        <Image
-          src="https://bangsoal.s3.ap-southeast-1.amazonaws.com/static/empty-state-under-construction.svg"
-          alt="Under Construction"
-          width={400}
-          height={260}
-          loading="eager"
-          className="w-64 sm:w-80"
-          unoptimized
-        />
+      <ContextMenuTrigger className="fixed inset-0 z-50 flex h-screen flex-col items-center justify-center bg-surface-100/90 px-5 backdrop-blur-3xl sm:px-10">
         <div className="flex flex-col items-center gap-2 py-5">
           <h1 className="text-center text-2xl font-bold sm:text-4xl">
             Hi, bang! Website BangSoal sedang dalam perbaikan 🛠

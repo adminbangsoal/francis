@@ -13,10 +13,11 @@ async function checkBackendServerAvailability() {
   try {
     const response = await fetch(`${process.env.API_URL}/api/health`, {
       method: "GET",
+      cache: "no-store", // Disable caching to get fresh status
     });
     return response.status === 200; // backend is available
   } catch (error) {
-    throw new Error("Backend server is not available");
+    return false; // backend is not available
   }
 }
 
