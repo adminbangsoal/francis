@@ -2,7 +2,6 @@
 const nextConfig = {
   productionBrowserSourceMaps: false,
   compress: true,
-  swcMinify: true,
   redirects: async () => {
     return [
       {
