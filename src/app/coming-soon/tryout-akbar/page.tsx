@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 
 dayjs.locale("id");
 
-const TARGET_DATE = dayjs("2026-02-28 08:00:00");
+const TARGET_DATE = dayjs("2026-03-14 08:00:00");
 
 interface CountdownTime {
   days: number;
